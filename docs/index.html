@@ -196,6 +196,7 @@
   <div class="presets-bar">
     <span class="preset-title">🍟 一键试玩常见麦门吃法：</span>
     <button type="button" class="preset-btn" onclick="applyPreset('double_no_drink')">🍔 顶饱双堡 · 不喝汽水 (28元)</button>
+    <button type="button" class="preset-btn" onclick="applyPreset('burger_with_fries')">🍟 单汉堡 ＋ 经典薯条 (25元)</button>
     <button type="button" class="preset-btn" onclick="applyPreset('chicken_lover')">🍗 纯鸡肉大满贯 (30元)</button>
     <button type="button" class="preset-btn" onclick="applyPreset('budget_20')">💰 20元极限吃饱</button>
     <button type="button" class="preset-btn" onclick="applyPreset('spicy')">🌶️ 就要吃辣 (35元)</button>
@@ -212,14 +213,19 @@
         <div class="segmented" id="drink"></div>
       </div>
       <div class="field">
-        <div class="label">单餐预算<span class="hint">今日点餐上限</span></div>
+        <div class="label">小食搭配<span class="hint">薯条/小食/不要</span></div>
+        <div class="segmented" id="side"></div>
+      </div>
+      <div class="field">
+        <div class="label">单餐预算<span class="hint">今日点餐上限（拖拽实时重算）</span></div>
         <div class="budget-row">
           <strong id="budgetValue">¥28</strong>
           <span id="budgetHint">超预算的组合将被列入下方排除清单</span>
         </div>
-        <input type="range" id="budget" min="10" max="40" step="1" value="28"
+        <input type="range" id="budget" min="10" max="60" step="1" value="28"
                aria-label="预算（元）">
-      </div>      <div class="field">
+      </div>
+      <div class="field">
         <div class="label">口味偏好<span class="hint">鸡肉/牛肉/不吃辣</span></div>
         <div class="segmented" id="taste"></div>
       </div>
@@ -444,84 +450,63 @@ const keyOf = (c) => c.items.map((i) => `${i.code}x${i.qty}`).join('|');
 // ---------------------------------------------------------------------------
 // 状态与渲染
 // ---------------------------------------------------------------------------
-const state = { burger: 2, drink: 0, budget: 28, taste: '' };
+const state = { burger: 2, drink: 0, side: 0, budget: 28, taste: '' };
 
 const OPTIONS = {
   burger: [[1, '1 份'], [2, '2 份'], [3, '3 份']],
   drink: [[0, '不配饮料'], [1, '搭配 1 份']],
+  side: [[0, '不要小食'], [1, '搭配 1 份'], [2, '搭配 2 份']],
   taste: [['', '不限'], ['chicken', '鸡肉'], ['beef', '牛肉'], ['non_spicy', '不辣']]
 };
 
 function applyPreset(name) {
   if (name === 'double_no_drink') {
-    state.limits = { burger: [2, 2], drink: [0, 0] };
-    state.budget = 2800;
-    state.preferred = [];
+    state.burger = 2;
+    state.drink = 0;
+    state.side = 0;
+    state.budget = 28;
+    state.taste = '';
+  } else if (name === 'burger_with_fries') {
+    state.burger = 1;
+    state.drink = 0;
+    state.side = 1;
+    state.budget = 25;
+    state.taste = '';
   } else if (name === 'chicken_lover') {
-    state.limits = { burger: [2, 2], drink: [0, 0] };
-    state.budget = 3000;
-    state.preferred = ['chicken'];
+    state.burger = 2;
+    state.drink = 0;
+    state.side = 0;
+    state.budget = 30;
+    state.taste = 'chicken';
   } else if (name === 'budget_20') {
-    state.limits = { burger: [1, 1], drink: [0, 0] };
-    state.budget = 2000;
-    state.preferred = [];
+    state.burger = 1;
+    state.drink = 0;
+    state.side = 0;
+    state.budget = 20;
+    state.taste = '';
   } else if (name === 'spicy') {
-    state.limits = { burger: [1, 2], drink: [0, 1] };
-    state.budget = 3500;
-    state.preferred = ['spicy'];
+    state.burger = 1;
+    state.drink = 1;
+    state.side = 0;
+    state.budget = 35;
+    state.taste = '';
   }
-  // Sync UI controls
-  syncControlsUI();
+  buildControls();
+  syncSliderUI();
   render();
 }
 
-function syncControlsUI() {
-  // Sync burger buttons
-  const bGroup = document.getElementById('burger');
-  if (bGroup) {
-    bGroup.querySelectorAll('button').forEach((btn, idx) => {
-      const vals = [[1, 2], [1, 1], [2, 2], [3, 99]];
-      const matches = JSON.stringify(state.limits.burger) === JSON.stringify(vals[idx]);
-      btn.setAttribute('aria-pressed', matches ? 'true' : 'false');
-    });
-  }
-  // Sync drink buttons
-  const dGroup = document.getElementById('drink');
-  if (dGroup) {
-    dGroup.querySelectorAll('button').forEach((btn, idx) => {
-      const vals = [[0, 2], [0, 0], [1, 2]];
-      const matches = JSON.stringify(state.limits.drink) === JSON.stringify(vals[idx]);
-      btn.setAttribute('aria-pressed', matches ? 'true' : 'false');
-    });
-  }
-  // Sync budget slider & display
+function syncSliderUI() {
   const bInput = document.getElementById('budget');
   const bDisplay = document.getElementById('budgetValue');
-  if (bInput && bDisplay) {
-    bInput.value = state.budget / 100;
-    bDisplay.textContent = '¥' + (state.budget / 100).toFixed(0);
-  }
-  // Sync protein & spicy
-  const pGroup = document.getElementById('protein');
-  if (pGroup) {
-    pGroup.querySelectorAll('button').forEach((btn, idx) => {
-      const vals = [[], ['chicken'], ['beef']];
-      const hasProtein = state.preferred.includes('chicken') ? 1 : (state.preferred.includes('beef') ? 2 : 0);
-      btn.setAttribute('aria-pressed', idx === hasProtein ? 'true' : 'false');
-    });
-  }
-  const sGroup = document.getElementById('spicy');
-  if (sGroup) {
-    sGroup.querySelectorAll('button').forEach((btn, idx) => {
-      const hasSpicy = state.preferred.includes('spicy') ? 2 : (state.forbidden.includes('spicy') ? 1 : 0);
-      btn.setAttribute('aria-pressed', idx === hasSpicy ? 'true' : 'false');
-    });
-  }
+  if (bInput) bInput.value = state.budget;
+  if (bDisplay) bDisplay.textContent = '¥' + state.budget;
 }
 
 function buildControls() {
-  for (const group of ['burger', 'drink', 'taste']) {
+  for (const group of ['burger', 'drink', 'side', 'taste']) {
     const host = document.getElementById(group);
+    if (!host) continue;
     host.innerHTML = '';
     for (const [value, text] of OPTIONS[group]) {
       const btn = document.createElement('button');
@@ -539,8 +524,11 @@ function buildControls() {
 }
 
 function currentProfile() {
-  const limits = { burger: [state.burger, state.burger] };
-  limits.drink = state.drink === 0 ? [0, 0] : [1, 1];
+  const limits = {
+    burger: [state.burger, state.burger],
+    drink: state.drink === 0 ? [0, 0] : [1, 1],
+    side: state.side === 0 ? [0, 0] : [state.side, state.side]
+  };
   return {
     limits,
     preferred: state.taste ? [state.taste] : [],
@@ -638,21 +626,33 @@ function render() {
     : `当前生效权重：${parts.join(' · ')}（合计 100）。未设定口味偏好，打分仅依预算余量决策——此时等价于按价格最优排序，标签客观标注为「价格优先」。`;
 }
 
+// 绑定单餐预算滑动条事件：拖拽实时响应重算
+const budgetSlider = document.getElementById('budget');
+if (budgetSlider) {
+  budgetSlider.addEventListener('input', (e) => {
+    state.budget = parseInt(e.target.value, 10) || 10;
+    document.getElementById('budgetValue').textContent = '¥' + state.budget;
+    render();
+  });
+}
+
 // 从 Pages 地址反推仓库链接：https://user.github.io/repo/ → https://github.com/user/repo
 (function () {
   const host = location.hostname;
   const segment = location.pathname.split('/').filter(Boolean)[0];
   const isPages = /\.github\.io$/i.test(host) && segment;
-  const link = document.getElementById('repoLink');
-  if (isPages) {
-    const owner = host.split('.')[0];
-    link.href = `https://github.com/${owner}/${segment}`;
-  } else {
-    link.href = 'https://github.com/search?q=%22mai-habit%22';
+  if (document.getElementById('repoLink')) {
+    if (isPages) {
+      const owner = host.split('.')[0];
+      document.getElementById('repoLink').href = `https://github.com/${owner}/${segment}`;
+    } else {
+      document.getElementById('repoLink').href = 'https://github.com/pha1aris/mai-habit';
+    }
   }
 })();
 
 buildControls();
+syncSliderUI();
 render();
 </script>
 </body>
