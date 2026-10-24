@@ -2,3 +2,6 @@
 * text=auto eol=lf
 *.svg text eol=lf
 *.json text eol=lf
+# 参赛声明必须与官方原文逐字一致。关掉一切换行转换，让本地字节原样入库，
+# 避免 Windows 的 CRLF 规范化改变文件哈希而被判成"改过"。
+CONTEST_DECLARATION.md -text

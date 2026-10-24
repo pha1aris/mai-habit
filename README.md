@@ -8,8 +8,10 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](#)
 [![Dependencies](https://img.shields.io/badge/dependencies-none-2ea44f)](#)
-[![Tests](https://img.shields.io/badge/tests-82%20passing-2ea44f)](#验证)
+[![Tests](https://img.shields.io/badge/tests-87%20passing-2ea44f)](#验证)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+**[▶ 在线试玩](#在线试玩)** ｜ **[30 秒上手](#三十秒跑起来)** ｜ **[它怎么排的](#打分怎么来的)** ｜ **[只读边界](#边界)**
 
 <!-- 仓库推上 GitHub 后，把上面 Tests 徽章换成实时 CI 徽章，并删除这一行注释：
 [![ci](https://github.com/<your-account>/mai-habit/actions/workflows/ci.yml/badge.svg)](https://github.com/<your-account>/mai-habit/actions/workflows/ci.yml)
@@ -36,6 +38,18 @@
 | 不喝饮料 | 套餐都带可乐，只能每次手动去掉 | `drink: max=0`，含饮料的组合不会被枚举出来 |
 | 价格 | 菜单标价相加 | 每个组合单独调用 `calculate-price` 试算，含优惠 |
 | 为什么推它 | 黑盒 | 给出分数拆解；**没被选中的，也给出排除原因** |
+
+## 在线试玩
+
+不想装任何东西：打开 [`docs/index.html`](docs/index.html)，左边改条件（几份主食、要不要饮料、预算、口味），右边实时出推荐和逐条排除原因。
+
+仓库开启 GitHub Pages（Settings → Pages → Source 选 `main` 分支的 `/docs` 目录）之后，这里就是可以直接点的演示页：`https://<你的用户名>.github.io/mai-habit/`。
+
+几点说明，避免误解：
+
+- **同一套算法。** 演示页是 `docs/index.html` 里的纯 JavaScript，枚举规则照搬 `planner.py`，打分照搬 `recommender.py`。CI 里的 `demo-parity` 会逐个比对两边的组合列表，不一致就红。
+- **口径不同。** 演示页用**菜单标价**做保守估算；命令行走 `calculate-price` 拿的是含优惠的实付价。所以同一组合在真实试算里可能更便宜，也可能因此多几个候选进预算。拿标价相加冒充实付价，正是本项目不做的事。
+- **数据是虚构的。** 门店、菜单、价格全部虚构，用于展示行为，不代表任何真实门店。
 
 ## 三十秒跑起来
 
@@ -275,9 +289,12 @@ examples/
   profile.demo.json              带口味与反馈的演示档案
   catalog.demo.json              内置演示候选
   replay/                        脱敏回放样本，用于无 Token 跑通全链路
-tests/                           82 项测试（含 test_contract.py：SKILL.md 的行为合约）
+tests/                           87 项测试（含 SKILL.md 行为合约与演示页同步）
 tools/render_screenshot.py       把真实输出渲染成 README 用的 SVG（CI 校验）
-.github/workflows/ci.yml         4 个 Python 版本 + 两条冒烟命令 + 截图复现
+tools/verify_demo_parity.py      比对浏览器与命令行的组合枚举（CI 卡口）
+docs/index.html                  在线试玩页，纯前端、零依赖、可离线打开
+docs/terminal.svg                README 首屏截图，由真实输出渲染
+.github/workflows/ci.yml         4 个 Python 版本 + 冒烟命令 + 截图复现 + 演示页一致性
 ```
 
 ## 验证
@@ -289,6 +306,8 @@ python -m unittest discover -s tests -v
 覆盖：习惯建档（交互/非交互、默认值、拒绝覆盖、示例档案提醒）、组成约束枚举、类别上下限、预算边界与优惠余量、报价过期、门店与餐段错配、忌口未核实、反馈学习只作用于对应餐段、权重归一化、MCP JSON/SSE 握手、分页游标、只读白名单、工具目录缓存、429/5xx 重试与 `Retry-After`、回放链路端到端、映射失败的原因聚合、cp936 控制台编码。
 
 `tests/test_contract.py` 单独测 `SKILL.md` 对外承诺的行为，不测内部实现：写工具在无 Token 时也必须因"不在范围内"被拒、可用工具缺 Token 时仍报缺凭证、预算无解时必须给出最低可行价且不放宽组成习惯、跳过数与"演示数据"标记必须出现在输出里。
+
+`tests/test_demo.py` 盯住演示页不许跑偏：菜单必须与 `examples/replay` 逐项相同、价格口径必须写明是"菜单标价"而非实付、虚构数据标记必须在首屏、页面里不许留占位符。另外 `python tools/verify_demo_parity.py` 会把浏览器里的枚举结果和 `planner.build` 逐条比对（10 / 4 / 20 三种组成形态），CI 里作为独立 job 卡住。
 
 ## 关于本仓库
 

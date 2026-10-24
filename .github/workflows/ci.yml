@@ -83,3 +83,17 @@ jobs:
             --meal lunch --budget 28 --store MCD-DEMO-001 > run.txt
           python tools/render_screenshot.py run.txt regenerated.svg
           diff -u docs/terminal.svg regenerated.svg
+
+  demo-parity:
+    name: Browser demo enumerates the same combos as the CLI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compare enumeration
+        run: python tools/verify_demo_parity.py
