@@ -259,10 +259,10 @@
     <span class="preset-title">🍟 麦门热门流派一键试玩：</span>
     <button type="button" class="preset-btn" onclick="applyPreset('couple_solo')">💑「520买一送一正好够我一人吃」(28元)</button>
     <button type="button" class="preset-btn" onclick="applyPreset('glutton_king')">🦖 大胃王寸草不生打法 (45元)</button>
+    <button type="button" class="preset-btn" onclick="applyPreset('cheat_meal')">😈 周末报复性放纵餐 (38元)</button>
+    <button type="button" class="preset-btn" onclick="applyPreset('clean_diet')">🥗 健人严选·减脂自律餐 (25元)</button>
     <button type="button" class="preset-btn" onclick="applyPreset('no_drink_dignity')">🥤 汉堡不配水·最后的体面 (25元)</button>
     <button type="button" class="preset-btn" onclick="applyPreset('poor_god_solo')">💸 穷鬼恩物极限单刷 (19元)</button>
-    <button type="button" class="preset-btn" onclick="applyPreset('burger_with_fries')">🍟 单汉堡 ＋ 薯条养生流 (25元)</button>
-    <button type="button" class="preset-btn" onclick="applyPreset('chicken_lover')">🍗 纯鸡肉大满贯 (30元)</button>
   </div>
 
   <div class="grid">
@@ -598,18 +598,20 @@ const OPTIONS = {
 
 const MEME_QUOTES = [
   '“520 情侣双堡买一送一？笑死，正好够我一人垫肚子。”',
-  '“情侣双人餐？不，这是单身碳水战神的基础打法！”',
+  '“减脂期吃麦当劳？板烧鸡腿去皮是优质白肉，零度是纯水，我这是在极致自律！”',
+  '“今天周五放纵餐（Cheat Meal）：汉堡两个起步，卡路里不过是一串数字！”',
   '“大胃王打法·三堡寸草不生：今天肚子里开麦当劳分店！”',
+  '“健身教练问我今天吃了什么，我说：纯正优质牛肉饼配全麦复合碳水。”',
   '“汉堡不配水，打工人最后的体面（水龙头有水，汉堡不行）。”',
   '“套餐硬塞中可乐？退退退！肚子里寸土寸金，不给汽水留空间！”',
   '“多加 5 毛钱升级板烧鸡腿，四舍五入等于麦当劳倒贴我钱！”',
+  '“只要我把汉堡里的生菜吃了，这顿麦当劳在物理上就是健康的减脂沙拉！”',
   '“穷鬼恩物极限精算：花最狠的零钱，吃最硬的吉士双堡！”',
-  '“把麦当劳底裤算穿：19块钱拿下俩堡，资本家看了都落泪。”',
+  '“平时减脂像苦行僧，周末放纵餐一顿直接给胰岛素上强度！”',
+  '“只要吃得够快，热量和脂肪就追不上我的基础代谢！”',
+  '“今天练腿消耗大，必须来两个牛肉汉堡给股四头肌上上供！”',
   '“生活索然无味，吉士汉堡抚慰；周一到周日我都是麦门狂徒！”',
-  '“第二份半价不是为了找人分享，是为了给大胃王留点尊严。”',
-  '“在工位上像个打工人，在麦当劳点餐柜台前我是选妃的皇帝！”',
-  '“两个汉堡下肚直接给肠胃上对抗，今天谁也别劝我吃草！”',
-  '“麦门永存！若有不服，请我吃俩麦辣鸡腿堡我们当面辩论！”'
+  '“在工位上像个打工人，在麦当劳点餐柜台前我是选妃的皇帝！”'
 ];
 let currentQuoteIdx = 0;
 function nextMemeQuote() {
@@ -631,6 +633,18 @@ function applyPreset(name) {
     state.side = 1;
     state.budget = 45;
     state.taste = '';
+  } else if (name === 'cheat_meal') {
+    state.burger = 2;
+    state.drink = 1;
+    state.side = 1;
+    state.budget = 38;
+    state.taste = '';
+  } else if (name === 'clean_diet') {
+    state.burger = 1;
+    state.drink = 0;
+    state.side = 0;
+    state.budget = 25;
+    state.taste = 'chicken';
   } else if (name === 'no_drink_dignity') {
     state.burger = 2;
     state.drink = 0;
@@ -642,24 +656,6 @@ function applyPreset(name) {
     state.drink = 0;
     state.side = 0;
     state.budget = 19;
-    state.taste = '';
-  } else if (name === 'burger_with_fries') {
-    state.burger = 1;
-    state.drink = 0;
-    state.side = 1;
-    state.budget = 25;
-    state.taste = '';
-  } else if (name === 'chicken_lover') {
-    state.burger = 2;
-    state.drink = 0;
-    state.side = 0;
-    state.budget = 30;
-    state.taste = 'chicken';
-  } else if (name === 'spicy') {
-    state.burger = 1;
-    state.drink = 1;
-    state.side = 0;
-    state.budget = 35;
     state.taste = '';
   }
   buildControls();
@@ -773,10 +769,16 @@ function render() {
       if (pick.items.length < 2) why.push('<span>仅含单款餐品（两份相同）</span>');
       if (state.burger === 3) {
         why.push('<span class="hit meme-tag">🦖 大胃王认证：单人狂炫三堡，寸草不生</span>');
+      } else if (state.burger >= 2 && state.side >= 1 && state.drink >= 1) {
+        why.push('<span class="hit meme-tag">😈 报复性放纵餐：多巴胺狂飙，热量全给胰岛素上强度</span>');
+      } else if (state.burger === 1 && state.drink === 0 && state.side === 0 && state.taste === 'chicken') {
+        why.push('<span class="hit meme-tag">🥗 健人严选减脂餐：板烧优质白肉，教练查岗直接发朋友圈</span>');
       } else if (state.burger === 2 && state.drink === 0) {
         why.push('<span class="hit meme-tag">🍔 520一人食打法：实心碳水顶饱，不给汽水留空间</span>');
+      } else if (state.taste === 'beef') {
+        why.push('<span class="hit meme-tag">🥩 纯红肉增肌流：高蛋白铁元素拉满，今天练腿底气足</span>');
       } else if (state.side >= 1) {
-        why.push('<span class="hit meme-tag">🍟 薯条是蔬菜：营养均衡，麦门养生流</span>');
+        why.push('<span class="hit meme-tag">🍟 薯条是蔬菜：营养均衡，麦门自欺欺人流</span>');
       }
 
       el.innerHTML = `
