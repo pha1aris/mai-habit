@@ -6,14 +6,12 @@
 
 固定要两个汉堡、套餐里的饮料不喝、预算 28 元 —— 这些不是"猜你喜欢"的标签，是硬约束。
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](#)
+[![ci](https://github.com/pha1aris/mai-habit/actions/workflows/ci.yml/badge.svg)](https://github.com/pha1aris/mai-habit/actions/workflows/ci.yml)
 [![Dependencies](https://img.shields.io/badge/dependencies-none-2ea44f)](#)
 [![Tests](https://img.shields.io/badge/tests-87%20passing-2ea44f)](#验证)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-**[▶ 在线试玩](#在线试玩)** ｜ **[30 秒上手](#三十秒跑起来)** ｜ **[它怎么排的](#打分怎么来的)** ｜ **[只读边界](#边界)**
-
-<!-- 推上 GitHub 后，可把上面的 Tests 徽章换成 Actions 页面给你的实时 CI 徽章地址。 -->
+**[▶ 打开演示页](https://pha1aris.github.io/mai-habit/)** ｜ **[30 秒上手](#三十秒跑起来)** ｜ **[它怎么排的](#打分怎么来的)** ｜ **[只读边界](#边界)**
 
 <img src="docs/terminal.svg" alt="麦懂你推荐输出，含三档推荐与逐条排除原因" width="920">
 

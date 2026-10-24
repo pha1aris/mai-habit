@@ -1,5 +1,18 @@
 # 上架与分发清单
 
+## 当前进度
+
+- [x] 仓库已建并推送 → <https://github.com/pha1aris/mai-habit>（40 个文件，main）
+- [x] GitHub Pages 已开启并验证可访问 → <https://pha1aris.github.io/mai-habit/>
+- [x] CI 全绿（4 个 Python 版本 + 截图复现 + 演示页枚举一致性）
+- [x] 描述、Website、11 个 Topics 已通过 API 设置
+- [ ] **Social preview 上传**（GitHub 没有 API，只能在 Settings 里手动选文件）
+- [ ] **申请 MCP Token**（资格线，最重要）
+- [ ] **提交报名 Issue**（截止 10-25 23:59）
+- [ ] 分发
+
+下面第 1–3 步已完成，留作记录；从第 4 步的 Social preview 开始做。
+
 截止：**2026-10-25 23:59**（北京时间）。排行榜数据截止 10-26 00:00。
 当前门槛（10-24 11:00 官方榜）：**第 99 名 42 星**，且仍在上涨。
 
