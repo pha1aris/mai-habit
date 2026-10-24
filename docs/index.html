@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>麦懂你 · 按你的固定吃法算出这一餐</title>
-<meta name="description" content="说清楚几份主食、要不要饮料、预算多少，它把门店菜单枚举成组合，逐个试算，给出可解释的推荐和被排除的原因。">
+<title>麦懂你 · 依据用餐习惯精算每一餐</title>
+<meta name="description" content="一次设定主食份数、饮品需求与单餐预算，依据门店菜单枚举组合并逐一试算，提供可解释的推荐方案与清晰的排除理由。">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   :root {
@@ -155,55 +155,54 @@
 <div class="wrap">
   <header>
     <span class="tag">虚构菜单 · 非真实报价</span>
-    <h1>你固定这么吃，那就按<em>这么吃</em>算给你</h1>
+    <h1>麦门吃法你说了算，组合与优惠<em>为你精算</em></h1>
     <p class="lede">
-      大多数推荐在猜你喜欢什么。这个不猜：把「两份主食、不要饮料、28 元」当硬条件，
-      把门店菜单枚举成组合，逐个试算，再告诉你为什么选它、为什么排掉别的。
+      就想单点俩汉堡，不想被套餐硬塞可乐？麦懂你告别无效凑单：将「两份主食、不配饮料、预算 28 元」设为硬性约束，
+      从门店菜单中枚举合规组合并逐一试算，清楚呈现入选评分与未入选组合的具体排除理由。
     </p>
   </header>
 
   <div class="grid">
     <section class="panel" aria-label="用餐习惯">
       <div class="field">
-        <div class="label">一餐几份主食<span class="hint">汉堡类</span></div>
+        <div class="label">主食份数<span class="hint">想吃几只汉堡</span></div>
         <div class="segmented" id="burger"></div>
       </div>
       <div class="field">
-        <div class="label">要不要配饮料</div>
+        <div class="label">搭配饮品<span class="hint">汽水/咖啡/不喝</span></div>
         <div class="segmented" id="drink"></div>
       </div>
       <div class="field">
-        <div class="label">这一餐预算</div>
+        <div class="label">单餐预算<span class="hint">今日点餐上限</span></div>
         <div class="budget-row">
           <strong id="budgetValue">¥28</strong>
-          <span id="budgetHint">超出预算的组合会被逐个列出来</span>
+          <span id="budgetHint">超预算的组合将被列入下方排除清单</span>
         </div>
         <input type="range" id="budget" min="10" max="40" step="1" value="28"
                aria-label="预算（元）">
       </div>      <div class="field">
-        <div class="label">口味偏好<span class="hint">不确定就选「不限」</span></div>
+        <div class="label">口味偏好<span class="hint">鸡肉/牛肉/不吃辣</span></div>
         <div class="segmented" id="taste"></div>
       </div>
       <div class="field">
         <div class="note">
-          没有口味偏好时，它不会假装懂你——只会按价格排序，并明确标注「价格优先」。
+          未指定口味偏好时，系统拒绝伪装个性化：仅依价格排序并明确标注「价格优先」。
         </div>
         <div class="note" style="margin-top:8px">
-          这里用的是<strong>菜单标价</strong>，属于保守估算。命令行走 <strong>calculate-price</strong>
-          拿到的是含优惠的实付价，所以同一组合在真实试算里可能更便宜，也就可能有更多组合进预算。
-          拿标价相加冒充实付价，正是这个项目刻意不做的事。
+          演示页采用<strong>菜单标价</strong>进行<strong>保守估算</strong>。终端命令行通过 <strong>calculate-price</strong>
+          接口获取含优惠券的券后实付价，因此相同组合在真实试算下可能更划算，亦可能有更多组合纳入预算。坚决不拿标价简单相加冒充真实应付，正是本项目的核心原则。
         </div>
       </div>
     </section>
 
     <section class="result" aria-live="polite">
       <div class="result-head">
-        <h2>这一餐的候选</h2>
+        <h2>本餐推荐方案</h2>
         <div class="meta" id="summary"></div>
       </div>
       <div id="picks" class="picks"></div>
       <details class="rejects" id="rejectsBox">
-        <summary>被排除的组合</summary>
+        <summary>未入选的组合及排除原因</summary>
         <ul class="reject-list" id="rejects"></ul>
       </details>
       <div class="weights" id="weights"></div>
@@ -212,14 +211,14 @@
 
   <footer>
     <p>
-      这里的菜单、价格、门店全是虚构的演示数据，用来展示算法行为，不是麦当劳的真实菜单或报价。
-      接上麦当劳 MCP 后，同样的枚举与排序跑在 <code>query-meals</code> 和 <code>calculate-price</code>
-      的真实返回上；报价 15 分钟内有效，下单前需要重新试算。
+      本页面展示的菜单、定价与门店均为脱敏虚构的演示数据，旨在直观呈现组合枚举与评分逻辑，不代表麦当劳真实商业报价。
+      接入麦当劳官方 MCP 后，相同的组合枚举与打分算法将直接运行于 <code>query-meals</code> 实时菜单与 <code>calculate-price</code>
+      真实计价响应上；报价具备 15 分钟时效保护机制，超时需重新试算。
     </p>
     <p>
-      只调用查询与试算工具，不碰领券、下单、取消——本项目的客户端在代码层拒绝写操作。
+      客户端严格遵循只读原则，仅放行查询与计价接口，从底层代码阻断领券、下单、取消等任何写操作。
     </p>
-    <a class="cta" id="repoLink" href="#" rel="noopener">在 GitHub 上查看源码</a>
+    <a class="cta" id="repoLink" href="#" rel="noopener">在 GitHub 上查看源码仓库</a>
   </footer>
 </div>
 
@@ -410,7 +409,7 @@ const state = { burger: 2, drink: 0, budget: 28, taste: '' };
 
 const OPTIONS = {
   burger: [[1, '1 份'], [2, '2 份'], [3, '3 份']],
-  drink: [[0, '不喝'], [1, '1 份']],
+  drink: [[0, '不配饮料'], [1, '搭配 1 份']],
   taste: [['', '不限'], ['chicken', '鸡肉'], ['beef', '牛肉'], ['non_spicy', '不辣']]
 };
 
@@ -447,7 +446,7 @@ function render() {
   const budgetCents = state.budget * 100;
   document.getElementById('budgetValue').textContent = '¥' + state.budget;
   document.getElementById('budgetHint').textContent =
-    state.budget < 19 ? '这个预算可能一份都覆盖不了' : '超出预算的组合会被逐个列出来';
+    state.budget < 19 ? '当前预算不足以覆盖任何合规组合' : '超出预算的组合将被列入下方排除清单';
 
   const result = rank(currentProfile(), budgetCents);
   const picksHost = document.getElementById('picks');
@@ -460,7 +459,7 @@ function render() {
     summary.textContent = '没有可售餐品';
     picksHost.innerHTML = `<div class="empty"><strong>这个菜单里没有 ${
       CAT_LABEL[result.missing] || result.missing} 类餐品</strong>
-      所以你「要${CAT_LABEL[result.missing] || result.missing}」这个习惯无法满足。不会偷偷换掉它。</div>`;
+      因此您设定的包含 ${CAT_LABEL[result.missing] || result.missing} 的习惯无法满足，系统绝不擅自替换。</div>`;
     rejectsBox.hidden = true;
     document.getElementById('weights').textContent = '';
     return;
@@ -477,9 +476,9 @@ function render() {
       .map((m) => parseFloat(m[1]))
       .sort((a, b) => a - b)[0];
     picksHost.innerHTML = `<div class="empty">
-      <strong>预算 ¥${state.budget.toFixed(2)} 覆盖不了任何组合</strong>
-      ${floor ? `按菜单价，最便宜的一个约需 ¥${floor.toFixed(2)}。` : ''}
-      组成习惯和忌口一个都不会放宽——只调整预算这一个变量。
+      <strong>当前预算 ¥${state.budget.toFixed(2)} 无法覆盖任何合规组合</strong>
+      ${floor ? `依据菜单标价估算，门槛最低的组合约需 ¥${floor.toFixed(2)}。` : ''}
+      饮食习惯与忌口约束绝不擅自放宽——仅建议根据需要调整单餐预算。
     </div>`;
   } else {
     for (const pick of result.picks) {
@@ -489,10 +488,10 @@ function render() {
       if (pick.matched.length) {
         why.push(`<span class="hit">命中 ${pick.matched.map((t) => TAG_LABEL[t] || t).join('、')}</span>`);
       } else if (state.taste) {
-        why.push('<span class="miss">没有候选命中你的口味</span>');
+        why.push('<span class="miss">暂无候选命中口味偏好</span>');
       }
       why.push(`<span>预算余量 ${yuan(pick.remaining)}</span>`);
-      if (pick.items.length < 2) why.push('<span>只有一种餐品，可能不合胃口</span>');
+      if (pick.items.length < 2) why.push('<span>仅含单款餐品（两份相同）</span>');
 
       el.innerHTML = `
         <div class="pick-top">
@@ -529,8 +528,8 @@ function render() {
     return `<b>${label} ${Math.round(result.weights[k] * 10) / 10}</b>`;
   });
   document.getElementById('weights').innerHTML = result.weights.taste
-    ? `当前生效权重：${parts.join(' · ')}（合计 100）。没有反馈记录，所以「历史反馈」这一维被摘掉了，剩下的重新归一到 100。`
-    : `当前生效权重：${parts.join(' · ')}（合计 100）。你没有给口味偏好，所以评分里只有预算余量——这时候排序等价于按价格排，标签也照实写成「价格优先」。`;
+    ? `当前生效权重：${parts.join(' · ')}（合计 100）。由于暂无反馈历史，「历史反馈」维度已剥离，剩余维度权重已自适应归一化至 100。`
+    : `当前生效权重：${parts.join(' · ')}（合计 100）。未设定口味偏好，打分仅依预算余量决策——此时等价于按价格最优排序，标签客观标注为「价格优先」。`;
 }
 
 // 从 Pages 地址反推仓库链接：https://user.github.io/repo/ → https://github.com/user/repo
