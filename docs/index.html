@@ -3,18 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>麦懂你 · 依据用餐习惯精算每一餐</title>
-<meta name="description" content="一次设定主食份数、饮品需求与单餐预算，依据门店菜单枚举组合并逐一试算，提供可解释的推荐方案与清晰的排除理由。">
+<title>麦懂你 (mai-habit) · 麦门点单嘴替 · 依据用餐习惯精算每一餐</title>
+<meta name="description" content="就想单点俩汉堡，不想被套餐硬塞可乐？麦懂你一次设定你的固定吃法，每次都在实时菜单与优惠中为你重新精算券后底价。">
+<meta property="og:title" content="麦懂你 (mai-habit) · 麦门点单嘴替">
+<meta property="og:description" content="你的麦门吃法说一次，每次秒出券后最划算的真省钱方案！">
+<meta property="og:image" content="https://raw.githubusercontent.com/pha1aris/mai-habit/main/docs/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   :root {
     --red: #DA291C;
     --yellow: #FFC72C;
-    --ink: #1F2328;
-    --muted: #656D76;
-    --line: #D8DEE4;
-    --bg: #F6F8FA;
+    --gold: #D97706;
+    --ink: #1C1917;
+    --muted: #57534E;
+    --light-muted: #78716C;
+    --line: #E7E0D8;
+    --bg: #FDFBF7;
     --card: #FFFFFF;
+    --accent-bg: #FEF3C7;
   }
   body {
     margin: 0;
@@ -149,6 +156,30 @@
     font-size: 13.5px; font-weight: 600; padding: 9px 16px; border-radius: 8px;
   }
   .cta:hover { background: #000; }
+
+  /* Warm McDonald's Preset Chips */
+  .presets-bar {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 20px; padding: 12px 16px;
+    background: #FFF8EE; border: 1px solid #FDE68A; border-radius: 12px;
+  }
+  .preset-title { font-size: 13px; font-weight: 700; color: #92400E; }
+  .preset-btn {
+    font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+    padding: 5px 12px; border-radius: 999px;
+    background: #FFFFFF; color: #78350F; border: 1px solid #FCD34D;
+    transition: all .15s ease;
+  }
+  .preset-btn:hover {
+    background: #FFC72C; color: #1C1917; border-color: #F59E0B;
+    transform: translateY(-1px);
+  }
+  .panel, .result {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+  }
+  .segmented button[aria-pressed="true"] {
+    background: var(--red); color: #fff; border-color: var(--red);
+  }
 </style>
 </head>
 <body>
@@ -161,6 +192,14 @@
       从门店菜单中枚举合规组合并逐一试算，清楚呈现入选评分与未入选组合的具体排除理由。
     </p>
   </header>
+
+  <div class="presets-bar">
+    <span class="preset-title">🍟 一键试玩常见麦门吃法：</span>
+    <button type="button" class="preset-btn" onclick="applyPreset('double_no_drink')">🍔 顶饱双堡 · 不喝汽水 (28元)</button>
+    <button type="button" class="preset-btn" onclick="applyPreset('chicken_lover')">🍗 纯鸡肉大满贯 (30元)</button>
+    <button type="button" class="preset-btn" onclick="applyPreset('budget_20')">💰 20元极限吃饱</button>
+    <button type="button" class="preset-btn" onclick="applyPreset('spicy')">🌶️ 就要吃辣 (35元)</button>
+  </div>
 
   <div class="grid">
     <section class="panel" aria-label="用餐习惯">
@@ -412,6 +451,73 @@ const OPTIONS = {
   drink: [[0, '不配饮料'], [1, '搭配 1 份']],
   taste: [['', '不限'], ['chicken', '鸡肉'], ['beef', '牛肉'], ['non_spicy', '不辣']]
 };
+
+function applyPreset(name) {
+  if (name === 'double_no_drink') {
+    state.limits = { burger: [2, 2], drink: [0, 0] };
+    state.budget = 2800;
+    state.preferred = [];
+  } else if (name === 'chicken_lover') {
+    state.limits = { burger: [2, 2], drink: [0, 0] };
+    state.budget = 3000;
+    state.preferred = ['chicken'];
+  } else if (name === 'budget_20') {
+    state.limits = { burger: [1, 1], drink: [0, 0] };
+    state.budget = 2000;
+    state.preferred = [];
+  } else if (name === 'spicy') {
+    state.limits = { burger: [1, 2], drink: [0, 1] };
+    state.budget = 3500;
+    state.preferred = ['spicy'];
+  }
+  // Sync UI controls
+  syncControlsUI();
+  render();
+}
+
+function syncControlsUI() {
+  // Sync burger buttons
+  const bGroup = document.getElementById('burger');
+  if (bGroup) {
+    bGroup.querySelectorAll('button').forEach((btn, idx) => {
+      const vals = [[1, 2], [1, 1], [2, 2], [3, 99]];
+      const matches = JSON.stringify(state.limits.burger) === JSON.stringify(vals[idx]);
+      btn.setAttribute('aria-pressed', matches ? 'true' : 'false');
+    });
+  }
+  // Sync drink buttons
+  const dGroup = document.getElementById('drink');
+  if (dGroup) {
+    dGroup.querySelectorAll('button').forEach((btn, idx) => {
+      const vals = [[0, 2], [0, 0], [1, 2]];
+      const matches = JSON.stringify(state.limits.drink) === JSON.stringify(vals[idx]);
+      btn.setAttribute('aria-pressed', matches ? 'true' : 'false');
+    });
+  }
+  // Sync budget slider & display
+  const bInput = document.getElementById('budget');
+  const bDisplay = document.getElementById('budgetValue');
+  if (bInput && bDisplay) {
+    bInput.value = state.budget / 100;
+    bDisplay.textContent = '¥' + (state.budget / 100).toFixed(0);
+  }
+  // Sync protein & spicy
+  const pGroup = document.getElementById('protein');
+  if (pGroup) {
+    pGroup.querySelectorAll('button').forEach((btn, idx) => {
+      const vals = [[], ['chicken'], ['beef']];
+      const hasProtein = state.preferred.includes('chicken') ? 1 : (state.preferred.includes('beef') ? 2 : 0);
+      btn.setAttribute('aria-pressed', idx === hasProtein ? 'true' : 'false');
+    });
+  }
+  const sGroup = document.getElementById('spicy');
+  if (sGroup) {
+    sGroup.querySelectorAll('button').forEach((btn, idx) => {
+      const hasSpicy = state.preferred.includes('spicy') ? 2 : (state.forbidden.includes('spicy') ? 1 : 0);
+      btn.setAttribute('aria-pressed', idx === hasSpicy ? 'true' : 'false');
+    });
+  }
+}
 
 function buildControls() {
   for (const group of ['burger', 'drink', 'taste']) {

@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/hero-banner.png" alt="麦懂你 - 依据用餐习惯精算每一餐" width="920">
+
 # 麦懂你 (mai-habit)
 
 **就想单点俩汉堡，不想被套餐硬塞可乐？**  
