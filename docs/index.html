@@ -157,6 +157,31 @@
   }
   .cta:hover { background: #000; }
 
+  /* Commercial Upsell & Stretch Recommendation */
+  .pick.upsell-card {
+    border-left: 4px solid var(--gold);
+    background: #FFFCF7;
+    border-top: 1px dashed #FCD34D;
+    margin-top: 4px;
+  }
+  .upsell-badge {
+    background: #FEF3C7 !important;
+    color: #92400E !important;
+    border-color: #FCD34D !important;
+  }
+  .upgrade-btn {
+    font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer;
+    background: var(--red); color: #fff; border: none; border-radius: 999px;
+    padding: 3px 12px; margin-left: auto; transition: all .15s ease;
+  }
+  .upgrade-btn:hover {
+    background: #B91C1C; transform: translateY(-1px);
+  }
+  .upsell-floor-box {
+    margin-top: 10px; padding: 14px 16px; border-radius: 10px;
+    background: #FFFDF8; border: 1px solid #FCD34D;
+  }
+
   /* Warm McDonald's Preset Chips */
   .presets-bar {
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
@@ -382,6 +407,7 @@ function rank(profile, budgetCents) {
 
   const accepted = [];
   const rejected = [];
+  const overBudgetCandidates = [];
   for (const combo of combos) {
     const blocked = combo.tags.filter((t) => forbidden.has(t));
     const label = combo.items.map((i) => `${i.name}×${i.qty}`).join('＋');
@@ -392,6 +418,15 @@ function rank(profile, budgetCents) {
     if (combo.estimate > budgetCents) {
       const over = combo.estimate - budgetCents;
       rejected.push({ name: label, reason: `超预算 ${yuan(over)}（合计 ${yuan(combo.estimate)}）` });
+      const matched = combo.tags.filter((t) => preferred.has(t));
+      overBudgetCandidates.push(Object.assign({}, combo, {
+        name: label,
+        matched,
+        overCents: over,
+        diffYuan: (over / 100).toFixed(2),
+        totalYuan: (combo.estimate / 100).toFixed(2),
+        targetBudget: Math.ceil(combo.estimate / 100)
+      }));
       continue;
     }
     const matched = combo.tags.filter((t) => preferred.has(t));
@@ -442,7 +477,71 @@ function rank(profile, budgetCents) {
     picks.push(entry);
   });
 
-  return { accepted, rejected, weights, picks, tasteHit };
+  // 商业级扩展：计算「超预算最优加钱组合」 (Upsell / Stretch Recommendation)
+  let upsell = null;
+  if (!accepted.length && overBudgetCandidates.length) {
+    // 场景 A：当前预算过低全灭，挑选距离吃饱差额最少的底线最优组合
+    overBudgetCandidates.sort((a, b) => {
+      if (preferred.size) {
+        const matchDiff = b.matched.length - a.matched.length;
+        if (matchDiff !== 0) return matchDiff;
+      }
+      return a.overCents - b.overCents || a.estimate - b.estimate;
+    });
+    const best = overBudgetCandidates[0];
+    upsell = {
+      type: 'floor',
+      badge: '💡 仅差 ¥' + best.diffYuan + ' 即可吃饱',
+      name: best.name,
+      items: best.items,
+      estimate: best.estimate,
+      overCents: best.overCents,
+      diffYuan: best.diffYuan,
+      totalYuan: best.totalYuan,
+      targetBudget: best.targetBudget,
+      matched: best.matched,
+      reason: '当前预算偏紧，再加 ¥' + best.diffYuan + ' 即可满足习惯组合'
+    };
+  } else if (accepted.length && overBudgetCandidates.length) {
+    // 场景 B：预算内已有方案，挑选加钱少（<= ¥10 或 <= 35% 预算）且品质/口味更优的组合
+    const maxAcceptedMatch = Math.max(0, ...accepted.map((c) => c.matched.length));
+    const closeCandidates = overBudgetCandidates.filter((c) => c.overCents <= 1000 || c.overCents <= budgetCents * 0.35);
+    if (closeCandidates.length) {
+      closeCandidates.sort((a, b) => {
+        const aBoost = a.matched.length > maxAcceptedMatch ? 1 : 0;
+        const bBoost = b.matched.length > maxAcceptedMatch ? 1 : 0;
+        if (bBoost !== aBoost) return bBoost - aBoost;
+        if (preferred.size && b.matched.length !== a.matched.length) {
+          return b.matched.length - a.matched.length;
+        }
+        return a.overCents - b.overCents;
+      });
+      const best = closeCandidates[0];
+      let reason = '';
+      if (best.matched.length > maxAcceptedMatch) {
+        reason = '仅需多加 ¥' + best.diffYuan + '，即可升级为纯 ' + best.matched.map((t) => TAG_LABEL[t] || t).join('、') + ' 顶饱大满贯！';
+      } else if (best.overCents <= 300) {
+        reason = '仅需多加 ¥' + best.diffYuan + '（零钱），就能从吉士堡升级为更高品质大汉堡！';
+      } else {
+        reason = '多花 ¥' + best.diffYuan + '，享受更加丰盛扎实的升级组合。';
+      }
+      upsell = {
+        type: 'upgrade',
+        badge: '💡 麦门进阶 · 加 ¥' + best.diffYuan + ' 可升级',
+        name: best.name,
+        items: best.items,
+        estimate: best.estimate,
+        overCents: best.overCents,
+        diffYuan: best.diffYuan,
+        totalYuan: best.totalYuan,
+        targetBudget: best.targetBudget,
+        matched: best.matched,
+        reason
+      };
+    }
+  }
+
+  return { accepted, rejected, weights, picks, tasteHit, upsell };
 }
 
 const keyOf = (c) => c.items.map((i) => `${i.code}x${i.qty}`).join('|');
@@ -564,15 +663,29 @@ function render() {
     `${result.accepted.length} 个在预算内 · 按菜单标价估算`;
 
   if (!result.picks.length) {
-    const floor = result.rejected
-      .map((r) => r.reason.match(/合计 ¥([\d.]+)/))
-      .filter(Boolean)
-      .map((m) => parseFloat(m[1]))
-      .sort((a, b) => a - b)[0];
+    const up = result.upsell;
     picksHost.innerHTML = `<div class="empty">
       <strong>当前预算 ¥${state.budget.toFixed(2)} 无法覆盖任何合规组合</strong>
-      ${floor ? `依据菜单标价估算，门槛最低的组合约需 ¥${floor.toFixed(2)}。` : ''}
-      饮食习惯与忌口约束绝不擅自放宽——仅建议根据需要调整单餐预算。
+      <p style="margin:6px 0 12px; color:var(--muted); font-size:13px;">
+        饮食习惯与忌口绝不擅自妥协——已为你精算出<strong>离能吃饱最近的最优方案</strong>：
+      </p>
+      ${up ? `
+      <div class="upsell-floor-box">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
+          <span style="font-weight:700; color:#1C1917; font-size:15px;">
+            ${up.items.map((i) => `${i.name} × ${i.qty}`).join(' ＋ ')}
+          </span>
+          <span style="font-weight:700; color:var(--red); font-size:17px;">
+            合计 ¥${up.totalYuan}
+          </span>
+        </div>
+        <div style="font-size:13px; color:#92400E; margin-bottom:10px;">
+          💡 仅需<strong>再加 ¥${up.diffYuan}</strong> 即可吃饱这一餐！
+        </div>
+        <button type="button" class="upgrade-btn" style="padding:6px 14px; font-size:12.5px;" onclick="state.budget=${up.targetBudget}; syncSliderUI(); render();">
+          ⚡ 一键提升预算至 ¥${up.targetBudget} 查看明细
+        </button>
+      </div>` : ''}
     </div>`;
   } else {
     for (const pick of result.picks) {
@@ -595,6 +708,29 @@ function render() {
         </div>
         <div class="items">${pick.items.map((i) => `${i.name} × ${i.qty}`).join('　·　')}</div>
         <div class="why">${why.join('')}</div>`;
+      picksHost.appendChild(el);
+    }
+
+    // 商业级推荐卡片：超预算进阶升级推荐
+    if (result.upsell && result.upsell.type === 'upgrade') {
+      const up = result.upsell;
+      const el = document.createElement('div');
+      el.className = 'pick upsell-card';
+      el.innerHTML = `
+        <div class="pick-top">
+          <span class="badge upsell-badge">${up.badge}</span>
+          <span class="pick-name">${up.items.map((i) => i.name).join(' ＋ ')}</span>
+          <span class="price">¥${up.totalYuan}<small>合计</small></span>
+        </div>
+        <div class="items">${up.items.map((i) => `${i.name} × ${i.qty}`).join('　·　')}</div>
+        <div class="why">
+          <span class="hit" style="background:#FEF3C7; color:#92400E; font-weight:600;">仅差 ¥${up.diffYuan}</span>
+          ${up.matched.length ? `<span class="hit">命中 ${up.matched.map((t) => TAG_LABEL[t] || t).join('、')}</span>` : ''}
+          <span style="color:#57534E;">${up.reason}</span>
+          <button type="button" class="upgrade-btn" onclick="state.budget=${up.targetBudget}; syncSliderUI(); render();">
+            ⚡ 一键拉高预算至 ¥${up.targetBudget}
+          </button>
+        </div>`;
       picksHost.appendChild(el);
     }
   }

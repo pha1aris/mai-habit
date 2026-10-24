@@ -135,5 +135,21 @@ class RecommendationTests(unittest.TestCase):
                          self.run_rank(profile=history_only)['weights'])
 
 
+    def test_commercial_upsell_mechanism(self):
+        # 场景 A：预算过低时，给出离吃饱差额最近的底线推荐
+        floor_result = self.run_rank(1500)
+        self.assertIsNotNone(floor_result.get('upsell'))
+        self.assertEqual('floor', floor_result['upsell']['type'])
+        self.assertEqual('3.90', floor_result['upsell']['diff_yuan'])
+        self.assertEqual(19, floor_result['upsell']['target_budget'])
+
+        # 场景 B：预算充足时，给出加钱升级的高品质/进阶推荐
+        upgrade_result = self.run_rank(2800)
+        self.assertIsNotNone(upgrade_result.get('upsell'))
+        self.assertEqual('upgrade', upgrade_result['upsell']['type'])
+        self.assertEqual('8.90', upgrade_result['upsell']['diff_yuan'])
+        self.assertEqual(37, upgrade_result['upsell']['target_budget'])
+
+
 if __name__ == '__main__':
     unittest.main()

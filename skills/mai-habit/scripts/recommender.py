@@ -70,7 +70,7 @@ def rank(profile, catalog, meal, budget_cents, now=None):
     preferred = set(profile.get('preferred_tags', []))
     history = profile.get('feedback', {}).get(meal, {})
     category_limits = profile.get('category_limits', {})
-    accepted, rejected, seen = [], [], set()
+    accepted, rejected, seen, over_budget_candidates = [], [], set(), []
     for candidate in catalog.get('candidates', []):
         name = candidate.get('name', '未命名套餐')
         try:
@@ -121,6 +121,20 @@ def rank(profile, catalog, meal, budget_cents, now=None):
             if quote.get('valid_until') and now > parse_time(quote['valid_until']):
                 raise ValueError('优惠或报价已失效')
             if price > budget_cents:
+                over = price - budget_cents
+                matches = sorted(preferred & tags)
+                over_budget_candidates.append({
+                    'id': cid,
+                    'name': name,
+                    'items': candidate.get('items', []),
+                    'quote': quote,
+                    'tags': tags,
+                    'over_cents': over,
+                    'diff_yuan': f"{over / 100:.2f}",
+                    'total_yuan': f"{price / 100:.2f}",
+                    'target_budget': (price + 99) // 100,
+                    'matched_tags': matches,
+                })
                 raise ValueError(f'超预算 {money(price - budget_cents)}'
                                  f'（合计 {money(price)}）')
             matches = sorted(preferred & tags)
@@ -176,10 +190,58 @@ def rank(profile, catalog, meal, budget_cents, now=None):
                 pick = {'label': label, **candidate}
                 chosen[candidate['id']] = pick
                 picks.append(pick)
+    upsell = None
+    if not accepted and over_budget_candidates:
+        if preferred:
+            over_budget_candidates.sort(key=lambda c: (-len(c['matched_tags']), c['over_cents'], c['quote']['total_cents']))
+        else:
+            over_budget_candidates.sort(key=lambda c: (c['over_cents'], c['quote']['total_cents']))
+        best = over_budget_candidates[0]
+        upsell = {
+            'type': 'floor',
+            'badge': f"💡 仅差 ¥{best['diff_yuan']} 即可吃饱",
+            'name': best['name'],
+            'items': best['items'],
+            'diff_yuan': best['diff_yuan'],
+            'total_yuan': best['total_yuan'],
+            'target_budget': best['target_budget'],
+            'matched_tags': best['matched_tags'],
+            'reason': f"当前预算偏紧，再加 ¥{best['diff_yuan']} 即可满足习惯组合",
+        }
+    elif accepted and over_budget_candidates:
+        max_accepted_match = max((len(c['matched_tags']) for c in accepted), default=0)
+        close = [c for c in over_budget_candidates if c['over_cents'] <= 1000 or c['over_cents'] <= budget_cents * 0.35]
+        if close:
+            close.sort(key=lambda c: (
+                -(1 if len(c['matched_tags']) > max_accepted_match else 0),
+                -len(c['matched_tags']) if preferred else 0,
+                c['over_cents'],
+                c['quote']['total_cents']
+            ))
+            best = close[0]
+            if len(best['matched_tags']) > max_accepted_match:
+                reason = f"仅需多加 ¥{best['diff_yuan']}，即可升级为纯 {'、'.join(best['matched_tags'])} 顶饱大满贯！"
+            elif best['over_cents'] <= 300:
+                reason = f"仅需多加 ¥{best['diff_yuan']}（零钱），就能从吉士堡升级为更高品质大汉堡！"
+            else:
+                reason = f"多花 ¥{best['diff_yuan']}，享受更加丰盛扎实的升级组合。"
+            upsell = {
+                'type': 'upgrade',
+                'badge': f"💡 麦门进阶 · 加 ¥{best['diff_yuan']} 可升级",
+                'name': best['name'],
+                'items': best['items'],
+                'diff_yuan': best['diff_yuan'],
+                'total_yuan': best['total_yuan'],
+                'target_budget': best['target_budget'],
+                'matched_tags': best['matched_tags'],
+                'reason': reason,
+            }
+
     return {'mode': catalog['mode'], 'meal': meal, 'budget_cents': budget_cents,
             'store_id': catalog['store_id'], 'eligible_count': len(accepted),
             'weights': active_weights(bool(preferred), bool(history)),
-            'recommendations': picks, 'rejected': rejected}
+            'recommendations': picks, 'rejected': rejected,
+            'upsell': upsell}
 
 
 WEIGHT_LABELS = {'taste': '口味匹配', 'history': '历史反馈', 'budget': '预算余量'}
@@ -230,6 +292,11 @@ def markdown(result):
         # A cold start has no taste evidence, so the score is budget headroom only.
         detail.append(f"{'预算余量得分' if prices_only else '综合分'}：{pick['score']:.2f}")
         lines.extend(['；'.join(detail) + '。', ''])
+    if result.get('upsell'):
+        up = result['upsell']
+        lines.extend([f"## {up['badge']}：{up['name']}", '',
+                      '＋'.join(f"{item['name']} × {item.get('quantity', 1)}" for item in up['items']), '',
+                      f"合计 ¥{up['total_yuan']}（超出预算 ¥{up['diff_yuan']}）。{up['reason']}", ''])
     if not result['recommendations']:
         lines += ['暂无满足条件的套餐。可以更换门店、餐段或调整预算；忌口需先核实。', '']
     if result['rejected']:
