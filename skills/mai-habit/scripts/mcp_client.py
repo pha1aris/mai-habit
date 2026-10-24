@@ -14,6 +14,17 @@ READ_TOOLS = frozenset({
 RETRY_STATUS = frozenset({429, 500, 502, 503, 504})
 
 
+def ensure_read_only(name):
+    """Reject out-of-scope tools before anything else runs.
+
+    This is policy, not authentication: it must not depend on a token being
+    present, otherwise "no token" masks the real reason and a caller that
+    supplies one would be judged by a different rule set.
+    """
+    if name not in READ_TOOLS:
+        raise MCPError(f'该工具不在查询与试算范围内，已拒绝：{name}')
+
+
 class MCPError(RuntimeError):
     def __init__(self, message, retryable=False, retry_after=None):
         super().__init__(message)
@@ -152,8 +163,7 @@ class Client:
         raise MCPError('工具列表分页超过上限')
 
     def call(self, name, arguments):
-        if name not in READ_TOOLS:
-            raise MCPError('该工具不在本项目查询和试算范围内')
+        ensure_read_only(name)
         if not isinstance(arguments, dict):
             raise MCPError('工具参数必须是 JSON 对象')
         # Discover real inputSchema instead of assuming undocumented parameters.

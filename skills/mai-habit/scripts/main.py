@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 
 from recommender import TZ, learn, markdown, money, rank, set_currency
-from mcp_client import Client, MCPError
+from mcp_client import Client, MCPError, ensure_read_only
 import adapter
 import console
 import planner
@@ -169,7 +169,20 @@ def plan_run(args):
         missing = stats.get('missing_category')
         if missing:
             raise ValueError(f'当前菜单没有可售的 {missing} 类餐品，无法满足组成习惯')
-        raise ValueError('按当前习惯与预算没有可枚举的候选组合')
+        # Re-enumerate with no budget cap only to report the real floor. The
+        # result says what to relax instead of leaving "no candidates" bare, and
+        # it never widens the habit itself (composition and avoid tags still hold).
+        floor = planner.build(items, profile.get('category_limits') or {}, args.meal,
+                              None, max_candidates=1)
+        if not floor:
+            raise ValueError('按当前组成习惯没有可枚举的候选，请检查每类餐品的数量上下限')
+        cheapest = floor[0]
+        need = '＋'.join(f"{i['name']}×{i['quantity']}" for i in cheapest['items'])
+        raise ValueError(
+            f'预算 {money(budget_cents)} 覆盖不了最低可行组合。按菜单价估算，'
+            f'最便宜的组成是 {need}，约需 {money(cheapest["estimate_cents"])}'
+            f'（估算未含优惠，实际可能更低）。要按这个组成继续，请把预算放宽到 '
+            f'{cheapest["estimate_cents"] / 100:.2f} 元以上。')
     now = datetime.now(TZ)
     quotes, client = {}, None
     if args.prices:
@@ -336,6 +349,10 @@ def main():
             write(args.profile, profile)
             print('已记录明确反馈。下次推荐会按餐段使用这些偏好。')
         else:
+            # Policy first: an out-of-scope tool is refused whether or not a
+            # token exists, so the error names the real reason.
+            if args.command == 'mcp-call':
+                ensure_read_only(args.tool)
             client = Client(os.environ.get('MCD_MCP_TOKEN', ''))
             client.initialize()
             if args.command == 'mcp-tools':

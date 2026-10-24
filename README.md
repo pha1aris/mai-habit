@@ -8,7 +8,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](#)
 [![Dependencies](https://img.shields.io/badge/dependencies-none-2ea44f)](#)
-[![Tests](https://img.shields.io/badge/tests-74%20passing-2ea44f)](#验证)
+[![Tests](https://img.shields.io/badge/tests-82%20passing-2ea44f)](#验证)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 <!-- 仓库推上 GitHub 后，把上面 Tests 徽章换成实时 CI 徽章，并删除这一行注释：
@@ -251,9 +251,10 @@ python habit.py plan \
 
 ## 边界
 
-- **只读。** 客户端白名单只放行 8 个查询与计价工具，`create-order`、`cancel-order`、`auto-bind-coupons` 等写操作在代码层被拒绝。
+- **只读。** 客户端白名单只放行 8 个查询与计价工具，`create-order`、`cancel-order`、`auto-bind-coupons` 等写操作在代码层被拒绝。白名单是**策略**，在读取 Token 之前就生效：没配 Token 时请求写工具，报的是"不在范围内"，而不是"缺凭证"——否则真实原因会被掩盖，且换个入口（直接调 `client.call`）就会用另一套规则判断。
 - **不碰代下单与券套利。** 不收购、不转卖、不代下单，只调用官方 MCP 的查询与试算接口。二手平台上低价的来路自己承担风险，这个项目不去蹭。
 - **不猜忌口。** 档案里有 `avoid_tags` 但没有用 `--checked-avoid` 声明核实范围时，直接拒绝运行而不是静默跳过。
+- **预算不够时说清差多少。** 不会只回一句"没有候选"，而是报出按组成习惯的最低可行组合与实际价格，并明确"估算未含优惠"。放宽的只有预算这一个变量，组成习惯和忌口一律不动。
 - **不声称全菜单最优。** 只在本次成功枚举并计价的候选范围内比较。
 - **不做营养或医疗建议。** 价格、库存、券的有效期以下单时官方渠道为准。
 
@@ -274,7 +275,7 @@ examples/
   profile.demo.json              带口味与反馈的演示档案
   catalog.demo.json              内置演示候选
   replay/                        脱敏回放样本，用于无 Token 跑通全链路
-tests/                           74 项测试
+tests/                           82 项测试（含 test_contract.py：SKILL.md 的行为合约）
 tools/render_screenshot.py       把真实输出渲染成 README 用的 SVG（CI 校验）
 .github/workflows/ci.yml         4 个 Python 版本 + 两条冒烟命令 + 截图复现
 ```
@@ -286,6 +287,8 @@ python -m unittest discover -s tests -v
 ```
 
 覆盖：习惯建档（交互/非交互、默认值、拒绝覆盖、示例档案提醒）、组成约束枚举、类别上下限、预算边界与优惠余量、报价过期、门店与餐段错配、忌口未核实、反馈学习只作用于对应餐段、权重归一化、MCP JSON/SSE 握手、分页游标、只读白名单、工具目录缓存、429/5xx 重试与 `Retry-After`、回放链路端到端、映射失败的原因聚合、cp936 控制台编码。
+
+`tests/test_contract.py` 单独测 `SKILL.md` 对外承诺的行为，不测内部实现：写工具在无 Token 时也必须因"不在范围内"被拒、可用工具缺 Token 时仍报缺凭证、预算无解时必须给出最低可行价且不放宽组成习惯、跳过数与"演示数据"标记必须出现在输出里。
 
 ## 关于本仓库
 
