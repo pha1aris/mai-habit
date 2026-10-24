@@ -1,0 +1,211 @@
+{
+  "mode": "demo",
+  "store_id": "DEMO-STORE",
+  "candidates": [
+    {
+      "id": "chicken-pair",
+      "name": "两款鸡肉汉堡（虚构）",
+      "items": [
+        {
+          "name": "原味鸡肉汉堡",
+          "category": "burger",
+          "quantity": 1
+        },
+        {
+          "name": "烤鸡肉汉堡",
+          "category": "burger",
+          "quantity": 1
+        }
+      ],
+      "tags": [
+        "chicken",
+        "non_spicy"
+      ],
+      "tags_confirmed": true,
+      "categories_confirmed": true,
+      "checked_avoid_tags": [],
+      "available": true,
+      "meal_times": [
+        "lunch",
+        "dinner"
+      ],
+      "quote": {
+        "source": "demo",
+        "store_id": "DEMO-STORE",
+        "meal_time": "lunch",
+        "total_cents": 2590,
+        "quoted_at": "2026-10-24T12:00:00+08:00"
+      }
+    },
+    {
+      "id": "value-pair",
+      "name": "同款双汉堡（虚构）",
+      "items": [
+        {
+          "name": "小份鸡肉汉堡",
+          "category": "burger",
+          "quantity": 2
+        }
+      ],
+      "tags": [
+        "chicken"
+      ],
+      "tags_confirmed": true,
+      "categories_confirmed": true,
+      "checked_avoid_tags": [],
+      "available": true,
+      "meal_times": [
+        "lunch",
+        "dinner"
+      ],
+      "quote": {
+        "source": "demo",
+        "store_id": "DEMO-STORE",
+        "meal_time": "lunch",
+        "total_cents": 1890,
+        "quoted_at": "2026-10-24T12:00:00+08:00"
+      }
+    },
+    {
+      "id": "mixed-pair",
+      "name": "鸡牛双拼（虚构）",
+      "items": [
+        {
+          "name": "原味鸡肉汉堡",
+          "category": "burger",
+          "quantity": 1
+        },
+        {
+          "name": "牛肉汉堡",
+          "category": "burger",
+          "quantity": 1
+        }
+      ],
+      "tags": [
+        "chicken",
+        "beef",
+        "non_spicy"
+      ],
+      "tags_confirmed": true,
+      "categories_confirmed": true,
+      "checked_avoid_tags": [],
+      "available": true,
+      "meal_times": [
+        "lunch",
+        "dinner"
+      ],
+      "quote": {
+        "source": "demo",
+        "store_id": "DEMO-STORE",
+        "meal_time": "lunch",
+        "total_cents": 2790,
+        "quoted_at": "2026-10-24T12:00:00+08:00"
+      }
+    },
+    {
+      "id": "drink-combo",
+      "name": "汉堡薯条饮料套餐（虚构）",
+      "items": [
+        {
+          "name": "原味鸡肉汉堡",
+          "category": "burger",
+          "quantity": 1
+        },
+        {
+          "name": "薯条",
+          "category": "side",
+          "quantity": 1
+        },
+        {
+          "name": "可乐",
+          "category": "drink",
+          "quantity": 1
+        }
+      ],
+      "tags": [
+        "chicken",
+        "non_spicy"
+      ],
+      "tags_confirmed": true,
+      "categories_confirmed": true,
+      "checked_avoid_tags": [],
+      "available": true,
+      "meal_times": [
+        "lunch",
+        "dinner"
+      ],
+      "quote": {
+        "source": "demo",
+        "store_id": "DEMO-STORE",
+        "meal_time": "lunch",
+        "total_cents": 2390,
+        "quoted_at": "2026-10-24T12:00:00+08:00"
+      }
+    },
+    {
+      "id": "drink-pair",
+      "name": "双汉堡带饮料组合（虚构）",
+      "items": [
+        {
+          "name": "原味鸡肉汉堡",
+          "category": "burger",
+          "quantity": 2
+        },
+        {
+          "name": "可乐",
+          "category": "drink",
+          "quantity": 1
+        }
+      ],
+      "tags": [
+        "chicken",
+        "non_spicy"
+      ],
+      "tags_confirmed": true,
+      "categories_confirmed": true,
+      "checked_avoid_tags": [],
+      "available": true,
+      "meal_times": [
+        "lunch",
+        "dinner"
+      ],
+      "quote": {
+        "source": "demo",
+        "store_id": "DEMO-STORE",
+        "meal_time": "lunch",
+        "total_cents": 2690,
+        "quoted_at": "2026-10-24T12:00:00+08:00"
+      }
+    },
+    {
+      "id": "premium-pair",
+      "name": "大份双汉堡（虚构）",
+      "items": [
+        {
+          "name": "大份鸡肉汉堡",
+          "category": "burger",
+          "quantity": 2
+        }
+      ],
+      "tags": [
+        "chicken",
+        "non_spicy"
+      ],
+      "tags_confirmed": true,
+      "categories_confirmed": true,
+      "checked_avoid_tags": [],
+      "available": true,
+      "meal_times": [
+        "lunch",
+        "dinner"
+      ],
+      "quote": {
+        "source": "demo",
+        "store_id": "DEMO-STORE",
+        "meal_time": "lunch",
+        "total_cents": 3690,
+        "quoted_at": "2026-10-24T12:00:00+08:00"
+      }
+    }
+  ]
+}

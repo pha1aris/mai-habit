@@ -1,0 +1,74 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: tests (python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.10', '3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Demo needs no token and no dependencies
+        run: |
+          python habit.py demo --budget 28 > demo.txt
+          grep -q '麦懂你' demo.txt
+          grep -q '演示数据' demo.txt
+      - name: Full chain in replay mode
+        run: |
+          python habit.py plan \
+            --profile examples/profile.demo.json \
+            --mapping examples/replay/mapping.json \
+            --menu examples/replay/menu.json \
+            --prices examples/replay/prices.json \
+            --meal lunch --budget 28 --store MCD-DEMO-001 > plan.txt
+          grep -q '最合口味' plan.txt
+          grep -q '试算其中' plan.txt
+          grep -q '非真实菜单或报价' plan.txt
+      - name: A broken mapping fails loudly instead of guessing
+        run: |
+          python -c "import json,pathlib; m=json.loads(pathlib.Path('examples/replay/mapping.json').read_text(encoding='utf-8')); m['quote']={'total_cents':'notThere'}; pathlib.Path('bad.json').write_text(json.dumps(m), encoding='utf-8')"
+          if python habit.py plan --profile examples/profile.demo.json --mapping bad.json \
+               --menu examples/replay/menu.json --prices examples/replay/prices.json \
+               --meal lunch --budget 28 --store MCD-DEMO-001 > out.txt 2> err.txt; then
+            echo 'expected a non-zero exit'; exit 1
+          fi
+          grep -q '主要原因' err.txt
+
+  screenshot:
+    name: README screenshot still matches the code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Regenerate and compare
+        run: |
+          python habit.py plan \
+            --profile examples/profile.demo.json \
+            --mapping examples/replay/mapping.json \
+            --menu examples/replay/menu.json \
+            --prices examples/replay/prices.json \
+            --meal lunch --budget 28 --store MCD-DEMO-001 > run.txt
+          python tools/render_screenshot.py run.txt regenerated.svg
+          diff -u docs/terminal.svg regenerated.svg

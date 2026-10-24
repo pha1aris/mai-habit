@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="984" viewBox="0 0 920 984" role="img" aria-label=" Terminal output of the mai-habit plan command" font-family="ui-monospace, SFMono-Regular, Consolas, 'Microsoft YaHei', monospace">
+<rect width="920" height="984" rx="10" fill="#0d1117"/>
+<path d="M0 36V10a10 10 0 0 1 10-10h900a10 10 0 0 1 10 10v26z" fill="#161b22"/>
+<circle cx="22" cy="18" r="6" fill="#ff5f57"/>
+<circle cx="42" cy="18" r="6" fill="#febc2e"/>
+<circle cx="62" cy="18" r="6" fill="#28c840"/>
+<text x="460" y="22" fill="#8b949e" font-size="12" text-anchor="middle">mai-habit — python habit.py plan</text>
+<text x="30" y="81" fill="#ffa657" font-size="15" xml:space="preserve"># 麦懂你 · 用餐习惯推荐</text>
+<text x="30" y="129" fill="#f0883e" font-size="15" xml:space="preserve">演示数据 · 非真实菜单或报价</text>
+<text x="30" y="177" fill="#c9d1d9" font-size="15" xml:space="preserve">门店：MCD-DEMO-001 ｜ 餐段：lunch ｜ 预算：¥28.00</text>
+<text x="30" y="225" fill="#c9d1d9" font-size="15" xml:space="preserve">在当前已收集的 7 个合格候选中比较，不代表全菜单最低价。</text>
+<text x="30" y="249" fill="#c9d1d9" font-size="15" xml:space="preserve">枚举 10 个符合组成习惯的组合，试算其中 10 个。</text>
+<text x="30" y="273" fill="#7ee787" font-size="15" xml:space="preserve">按可用证据归一化的生效权重：口味匹配 70、历史反馈 20、预算余量 10（合计 100）。</text>
+<text x="30" y="321" fill="#79c0ff" font-size="15" xml:space="preserve">## 最合口味：板烧鸡腿堡×1＋吉士汉堡×1</text>
+<text x="30" y="369" fill="#c9d1d9" font-size="15" xml:space="preserve">板烧鸡腿堡 × 1＋吉士汉堡 × 1</text>
+<text x="30" y="417" fill="#7ee787" font-size="15" xml:space="preserve">合计 ¥23.50，预算余量 ¥4.50。</text>
+<text x="30" y="441" fill="#c9d1d9" font-size="15" xml:space="preserve">偏好匹配：chicken、non_spicy；历史反馈倾向：+0.42；综合分：80.05。</text>
+<text x="30" y="489" fill="#79c0ff" font-size="15" xml:space="preserve">## 预算优先：吉士汉堡×2</text>
+<text x="30" y="537" fill="#c9d1d9" font-size="15" xml:space="preserve">吉士汉堡 × 2</text>
+<text x="30" y="585" fill="#7ee787" font-size="15" xml:space="preserve">合计 ¥19.00，预算余量 ¥9.00。</text>
+<text x="30" y="609" fill="#c9d1d9" font-size="15" xml:space="preserve">偏好匹配：无明确偏好命中；历史反馈倾向：+0.00；综合分：3.21。</text>
+<text x="30" y="657" fill="#79c0ff" font-size="15" xml:space="preserve">## 换个口味：经典牛肉堡×1＋吉士汉堡×1</text>
+<text x="30" y="705" fill="#c9d1d9" font-size="15" xml:space="preserve">经典牛肉堡 × 1＋吉士汉堡 × 1</text>
+<text x="30" y="753" fill="#7ee787" font-size="15" xml:space="preserve">合计 ¥21.50，预算余量 ¥6.50。</text>
+<text x="30" y="777" fill="#c9d1d9" font-size="15" xml:space="preserve">偏好匹配：无明确偏好命中；历史反馈倾向：+0.00；综合分：2.32。</text>
+<text x="30" y="825" fill="#79c0ff" font-size="15" xml:space="preserve">## 排除原因</text>
+<text x="30" y="873" fill="#8b949e" font-size="15" xml:space="preserve">- 板烧鸡腿堡×2：超预算 ¥1.50（合计 ¥29.50）</text>
+<text x="30" y="897" fill="#8b949e" font-size="15" xml:space="preserve">- 板烧鸡腿堡×1＋麦辣鸡腿堡×1：超预算 ¥1.50（合计 ¥29.50）</text>
+<text x="30" y="921" fill="#8b949e" font-size="15" xml:space="preserve">- 麦辣鸡腿堡×2：超预算 ¥1.50（合计 ¥29.50）</text>
+</svg>

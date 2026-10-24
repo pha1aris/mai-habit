@@ -1,0 +1,189 @@
+{
+  "note": "回放样本：由虚构优惠规则生成，不是麦当劳真实报价，也不能证明已完成真实联调。",
+  "quotes": [
+    {
+      "items": [
+        {
+          "code": "BR005",
+          "quantity": 2
+        }
+      ],
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"payPrice\": \"19.00\", \"originalPrice\": \"19.00\", \"expireTime\": null}"
+          }
+        ]
+      }
+    },
+    {
+      "items": [
+        {
+          "code": "BR001",
+          "quantity": 1
+        },
+        {
+          "code": "BR005",
+          "quantity": 1
+        }
+      ],
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"payPrice\": \"21.50\", \"originalPrice\": \"22.50\", \"expireTime\": null}"
+          }
+        ]
+      }
+    },
+    {
+      "items": [
+        {
+          "code": "BR003",
+          "quantity": 1
+        },
+        {
+          "code": "BR005",
+          "quantity": 1
+        }
+      ],
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"payPrice\": \"23.50\", \"originalPrice\": \"25.00\", \"expireTime\": null}"
+          }
+        ]
+      }
+    },
+    {
+      "items": [
+        {
+          "code": "BR004",
+          "quantity": 1
+        },
+        {
+          "code": "BR005",
+          "quantity": 1
+        }
+      ],
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"payPrice\": \"23.50\", \"originalPrice\": \"25.00\", \"expireTime\": null}"
+          }
+        ]
+      }
+    },
+    {
+      "items": [
+        {
+          "code": "BR001",
+          "quantity": 2
+        }
+      ],
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"payPrice\": \"24.00\", \"originalPrice\": \"26.00\", \"expireTime\": null}"
+          }
+        ]
+      }
+    },
+    {
+      "items": [
+        {
+          "code": "BR001",
+          "quantity": 1
+        },
+        {
+          "code": "BR003",
+          "quantity": 1
+        }
+      ],
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"payPrice\": \"26.50\", \"originalPrice\": \"28.50\", \"expireTime\": null}"
+          }
+        ]
+      }
+    },
+    {
+      "items": [
+        {
+          "code": "BR001",
+          "quantity": 1
+        },
+        {
+          "code": "BR004",
+          "quantity": 1
+        }
+      ],
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"payPrice\": \"26.50\", \"originalPrice\": \"28.50\", \"expireTime\": null}"
+          }
+        ]
+      }
+    },
+    {
+      "items": [
+        {
+          "code": "BR003",
+          "quantity": 2
+        }
+      ],
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"payPrice\": \"29.50\", \"originalPrice\": \"31.00\", \"expireTime\": null}"
+          }
+        ]
+      }
+    },
+    {
+      "items": [
+        {
+          "code": "BR004",
+          "quantity": 1
+        },
+        {
+          "code": "BR003",
+          "quantity": 1
+        }
+      ],
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"payPrice\": \"29.50\", \"originalPrice\": \"31.00\", \"expireTime\": null}"
+          }
+        ]
+      }
+    },
+    {
+      "items": [
+        {
+          "code": "BR004",
+          "quantity": 2
+        }
+      ],
+      "response": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"payPrice\": \"29.50\", \"originalPrice\": \"31.00\", \"expireTime\": null}"
+          }
+        ]
+      }
+    }
+  ]
+}

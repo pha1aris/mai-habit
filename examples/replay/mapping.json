@@ -1,0 +1,31 @@
+{
+  "note": "非官方字段定义。请按 tools/list 返回的真实 inputSchema 与你自己的响应结构改写。",
+  "mode": "demo",
+  "menu": {
+    "list": "categories.*.items.*",
+    "price_unit": "yuan",
+    "fields": {
+      "code": "productCode",
+      "name": "productName",
+      "category": "categoryName",
+      "price": "price",
+      "available": "saleStatus",
+      "meal_times": "mealPeriods",
+      "tags": "tasteTags"
+    }
+  },
+  "price_request": {
+    "storeCode": "${store_id}",
+    "mealPeriod": "${meal}",
+    "items": "${items}",
+    "itemTemplate": {
+      "productCode": "${code}",
+      "quantity": "${quantity}"
+    }
+  },
+  "quote": {
+    "total_cents": "payPrice",
+    "price_unit": "yuan",
+    "valid_until": "expireTime"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"storeCode\": \"MCD-DEMO-001\", \"storeName\": \"虚构演示餐厅（非真实门店）\", \"categories\": [{\"name\": \"汉堡\", \"items\": [{\"productCode\": \"BR001\", \"productName\": \"经典牛肉堡\", \"categoryName\": \"汉堡\", \"price\": \"13.00\", \"saleStatus\": 1, \"tasteTags\": [\"beef\"], \"mealPeriods\": [\"lunch\", \"dinner\"]}, {\"productCode\": \"BR003\", \"productName\": \"板烧鸡腿堡\", \"categoryName\": \"汉堡\", \"price\": \"15.50\", \"saleStatus\": 1, \"tasteTags\": [\"chicken\", \"non_spicy\"], \"mealPeriods\": [\"lunch\", \"dinner\"]}, {\"productCode\": \"BR004\", \"productName\": \"麦辣鸡腿堡\", \"categoryName\": \"汉堡\", \"price\": \"15.50\", \"saleStatus\": 1, \"tasteTags\": [\"chicken\", \"spicy\"], \"mealPeriods\": [\"lunch\", \"dinner\"]}, {\"productCode\": \"BR005\", \"productName\": \"吉士汉堡\", \"categoryName\": \"汉堡\", \"price\": \"9.50\", \"saleStatus\": 1, \"tasteTags\": [\"beef\"], \"mealPeriods\": [\"lunch\", \"dinner\"]}]}, {\"name\": \"饮料\", \"items\": [{\"productCode\": \"DR001\", \"productName\": \"可口可乐（中）\", \"categoryName\": \"饮料\", \"price\": \"8.00\", \"saleStatus\": 1, \"tasteTags\": [], \"mealPeriods\": [\"lunch\", \"dinner\"]}, {\"productCode\": \"DR002\", \"productName\": \"雪碧（中）\", \"categoryName\": \"饮料\", \"price\": \"8.00\", \"saleStatus\": 1, \"tasteTags\": [], \"mealPeriods\": [\"lunch\", \"dinner\"]}]}, {\"name\": \"小食\", \"items\": [{\"productCode\": \"SD001\", \"productName\": \"薯条（中）\", \"categoryName\": \"小食\", \"price\": \"10.00\", \"saleStatus\": 1, \"tasteTags\": [], \"mealPeriods\": [\"lunch\", \"dinner\"]}]}]}"
+    }
+  ]
+}

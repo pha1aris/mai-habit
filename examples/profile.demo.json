@@ -1,0 +1,28 @@
+{
+  "preferred_tags": [
+    "chicken",
+    "non_spicy"
+  ],
+  "avoid_tags": [],
+  "category_limits": {
+    "burger": {
+      "min": 2,
+      "max": 2
+    },
+    "drink": {
+      "max": 0
+    }
+  },
+  "feedback": {
+    "lunch": {
+      "chicken": {
+        "like": 4,
+        "dislike": 0
+      },
+      "non_spicy": {
+        "like": 3,
+        "dislike": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "preferred_tags": [],
+  "avoid_tags": [],
+  "category_limits": {
+    "burger": {
+      "min": 2,
+      "max": 2
+    },
+    "drink": {
+      "max": 0
+    }
+  },
+  "feedback": {}
+}

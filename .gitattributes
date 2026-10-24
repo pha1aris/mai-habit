@@ -1,0 +1,4 @@
+# Keep line endings stable so the SVG that CI regenerates matches the committed one.
+* text=auto eol=lf
+*.svg text eol=lf
+*.json text eol=lf

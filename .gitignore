@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+private/
+__pycache__/
+*.pyc
+*.tmp
+# 本地工作记录，不随仓库发布
+.workbuddy/
