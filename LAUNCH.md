@@ -40,12 +40,12 @@ python habit.py plan --profile private/profile.json \
 ## 第 2 步｜建仓库并推送（约 20 分钟）
 
 ```bash
-# 仓库必须是 public
-gh repo create mai-habit --public --source=. --push
-# 没有 gh 就在网页建好，然后：
-git remote add origin https://github.com/<你的用户名>/mai-habit.git
+# 网页建好空仓库（Public，不勾任何初始化文件）后：
+git remote add origin https://github.com/pha1aris/mai-habit.git
 git push -u origin main
 ```
+
+本机没有 `gh` 命令，所以用网页建仓库 + `git push`。推送时凭据助手会弹窗要求登录 GitHub，授权一次即可。
 
 推完立刻核对两件事：
 
@@ -58,7 +58,7 @@ git push -u origin main
 
 Settings → Pages → Source 选 **Deploy from a branch** → 分支 `main`、目录 `/docs` → Save。
 
-一两分钟后访问 `https://<你的用户名>.github.io/mai-habit/`，应该直接看到试玩页。
+一两分钟后访问 `https://pha1aris.github.io/mai-habit/`，应该直接看到试玩页。
 
 然后把地址回填到两处：仓库首页右侧 **Website** 字段、README 里「在线试玩」那一段。
 
@@ -68,20 +68,31 @@ Settings → Pages → Source 选 **Deploy from a branch** → 分支 `main`、�
 
 ## 第 4 步｜设置门面（约 10 分钟）
 
-**About 描述**（一行，会出现在搜索结果里）：
+**仓库名**：`mai-habit`　**可见性**：Public
+建仓库时**不要**勾 Add README / .gitignore / license，否则推送会冲突。
+
+**About 描述**（一行，会出现在搜索结果里，直接复制）：
 
 ```text
-固定吃法（两份主食、不要饮料）+ 预算，按门店真实菜单枚举组合并逐个试算，给出可解释的推荐与排除原因
+麦当劳 MCP Skill ｜ 固定吃法 + 预算，枚举门店菜单组合并逐个试算，给出可解释的推荐与逐条排除原因。只读，不代下单。
 ```
 
-**Topics**（别人搜索时能被命中）：
+**Website 字段**（About 右侧那个链接）：
 
 ```text
-mcp  mcdonalds  ai-agent  workbuddy  python  recommendation  cli  skill  meal-planner
+https://pha1aris.github.io/mai-habit/
 ```
 
-**Social preview**（分享到群里时的缩略图，GitHub 没有 API，只能手动传）：
-用浏览器打开 `docs/index.html` 截图，或直接用 `docs/terminal.svg` 转成 1200×630 PNG 后上传。
+**Topics**（About → 齿轮 → Topics，逐个粘）：
+
+```text
+mcp  mcdonalds  mcd-mcp  ai-agent  workbuddy  skill  python  recommendation  cli  meal-planner  coupon
+```
+
+**Social preview**（Settings → General → Social preview，分享到群里时的缩略图）：
+上传仓库里已经做好的 `docs/social-preview.png`（1200×630，76 KB）。
+
+> 这一步对点击率影响很直接：微信群/朋友圈里，有缩略图的链接比纯文本链接被点开的概率高得多。
 
 ---
 
@@ -94,13 +105,13 @@ mcp  mcdonalds  ai-agent  workbuddy  python  recommendation  cli  skill  meal-pl
 - 标题和正文之间**不要空行**
 - 项目地址**不要用 Markdown 链接**，直接贴纯文本 URL
 
-复制下面这段，把 `<你的用户名>` 替换掉：
+复制下面这段直接提交（账号名已填好）：
 
 ```text
 【参赛申请】麦懂你 · 按固定吃法逐单重算
 项目名称：麦懂你（mai-habit）
-项目地址：https://github.com/<你的用户名>/mai-habit
-项目简介：固定要两个汉堡、不要套餐饮料、预算 28 元——这些不是"猜你喜欢"的标签，而是硬约束。本项目把用户的组成习惯当作过滤条件，用 query-meals 拉门店菜单后按类别枚举合法组合（同款多份、类别上下限），对每个候选单独调用 calculate-price 拿含优惠的实付价，再按可用证据归一化权重排序，输出三档推荐并逐条列出被排除的组合及原因。只读：客户端白名单只放行 8 个查询与计价工具，create-order、cancel-order、auto-bind-coupons 等写操作在代码层被拒绝。关键设计是不猜 API 字段：响应映射由显式 mapping 文件声明，price_unit 必须写明 yuan 或 cents，对不上直接报错而不是猜；也不拿菜单标价相加代替实付价。附脱敏回放样本，无 Token 也能完整验证链路；在线试玩：https://<你的用户名>.github.io/mai-habit/
+项目地址：https://github.com/pha1aris/mai-habit
+项目简介：固定要两个汉堡、不要套餐饮料、预算 28 元——这些不是"猜你喜欢"的标签，而是硬约束。本项目把用户的组成习惯当作过滤条件，用 query-meals 拉门店菜单后按类别枚举合法组合（同款多份、类别上下限），对每个候选单独调用 calculate-price 拿含优惠的实付价，再按可用证据归一化权重排序，输出三档推荐并逐条列出被排除的组合及原因。只读：客户端白名单只放行 8 个查询与计价工具，create-order、cancel-order、auto-bind-coupons 等写操作在代码层被拒绝。关键设计是不猜 API 字段：响应映射由显式 mapping 文件声明，price_unit 必须写明 yuan 或 cents，对不上直接报错而不是猜；也不拿菜单标价相加代替实付价。附脱敏回放样本，无 Token 也能完整验证链路；在线试玩：https://pha1aris.github.io/mai-habit/
 ```
 
 提交后在 Issue 列表里确认自己的条目出现，之后官方会在帖子下回复核验结果。

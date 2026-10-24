@@ -41,7 +41,7 @@
 
 不想装任何东西：打开 [`docs/index.html`](docs/index.html)，左边改条件（几份主食、要不要饮料、预算、口味），右边实时出推荐和逐条排除原因。
 
-仓库开启 GitHub Pages（Settings → Pages → Source 选 `main` 分支的 `/docs` 目录）之后，这里就是可以直接点的演示页：`https://<你的用户名>.github.io/mai-habit/`。
+**https://pha1aris.github.io/mai-habit/**（GitHub Pages，Settings → Pages 选 `main` 分支的 `/docs` 目录）。不开 Pages 也能用：直接打开仓库里的 [`docs/index.html`](docs/index.html)，不联网都能跑。
 
 几点说明，避免误解：
 
