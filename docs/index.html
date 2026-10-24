@@ -182,6 +182,37 @@
     background: #FFFDF8; border: 1px solid #FCD34D;
   }
 
+  /* 麦门嘴替发疯语录盒 */
+  .meme-quote-card {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    border: 1px solid #FCD34D; border-radius: 12px;
+    padding: 10px 16px; margin-bottom: 14px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+  }
+  .meme-quote-tag {
+    font-size: 11.5px; font-weight: 800; color: #B45309; background: #FDE68A;
+    padding: 3px 8px; border-radius: 6px; white-space: nowrap;
+  }
+  .meme-quote-text {
+    flex: 1; font-size: 13.5px; font-weight: 600; color: #78350F;
+    font-style: italic; line-height: 1.4;
+  }
+  .meme-quote-dice {
+    font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer;
+    background: #FFF; color: #92400E; border: 1px solid #FCD34D;
+    border-radius: 999px; padding: 4px 12px; white-space: nowrap;
+    transition: all .15s ease;
+  }
+  .meme-quote-dice:hover {
+    background: var(--gold); color: #1C1917; border-color: #F59E0B;
+    transform: translateY(-1px);
+  }
+  .meme-tag {
+    background: #FFF1F2 !important; color: #BE123C !important;
+    border-color: #FECDD3 !important; font-weight: 600;
+  }
+
   /* Warm McDonald's Preset Chips */
   .presets-bar {
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
@@ -218,13 +249,20 @@
     </p>
   </header>
 
+  <div class="meme-quote-card">
+    <span class="meme-quote-tag">🗣️ 麦门嘴替发疯日记</span>
+    <span class="meme-quote-text" id="memeQuoteText">“520 情侣汉堡买一送一？笑死，正好够我一人垫肚子。”</span>
+    <button type="button" class="meme-quote-dice" onclick="nextMemeQuote()">🎲 换一句嘴替发言</button>
+  </div>
+
   <div class="presets-bar">
-    <span class="preset-title">🍟 一键试玩常见麦门吃法：</span>
-    <button type="button" class="preset-btn" onclick="applyPreset('double_no_drink')">🍔 顶饱双堡 · 不喝汽水 (28元)</button>
-    <button type="button" class="preset-btn" onclick="applyPreset('burger_with_fries')">🍟 单汉堡 ＋ 经典薯条 (25元)</button>
+    <span class="preset-title">🍟 麦门热门流派一键试玩：</span>
+    <button type="button" class="preset-btn" onclick="applyPreset('couple_solo')">💑「520买一送一正好够我一人吃」(28元)</button>
+    <button type="button" class="preset-btn" onclick="applyPreset('glutton_king')">🦖 大胃王寸草不生打法 (45元)</button>
+    <button type="button" class="preset-btn" onclick="applyPreset('no_drink_dignity')">🥤 汉堡不配水·最后的体面 (25元)</button>
+    <button type="button" class="preset-btn" onclick="applyPreset('poor_god_solo')">💸 穷鬼恩物极限单刷 (19元)</button>
+    <button type="button" class="preset-btn" onclick="applyPreset('burger_with_fries')">🍟 单汉堡 ＋ 薯条养生流 (25元)</button>
     <button type="button" class="preset-btn" onclick="applyPreset('chicken_lover')">🍗 纯鸡肉大满贯 (30元)</button>
-    <button type="button" class="preset-btn" onclick="applyPreset('budget_20')">💰 20元极限吃饱</button>
-    <button type="button" class="preset-btn" onclick="applyPreset('spicy')">🌶️ 就要吃辣 (35元)</button>
   </div>
 
   <div class="grid">
@@ -500,7 +538,7 @@ function rank(profile, budgetCents) {
       totalYuan: best.totalYuan,
       targetBudget: best.targetBudget,
       matched: best.matched,
-      reason: '当前预算偏紧，再加 ¥' + best.diffYuan + ' 即可满足习惯组合'
+      reason: '当前预算偏紧，再加 ¥' + best.diffYuan + ' 即可解锁麦门信徒的进食尊严！'
     };
   } else if (accepted.length && overBudgetCandidates.length) {
     // 场景 B：预算内已有方案，挑选加钱少（<= ¥10 或 <= 35% 预算）且品质/口味更优的组合
@@ -521,7 +559,7 @@ function rank(profile, budgetCents) {
       if (best.matched.length > maxAcceptedMatch) {
         reason = '仅需多加 ¥' + best.diffYuan + '，即可升级为纯 ' + best.matched.map((t) => TAG_LABEL[t] || t).join('、') + ' 顶饱大满贯！';
       } else if (best.overCents <= 300) {
-        reason = '仅需多加 ¥' + best.diffYuan + '（零钱），就能从吉士堡升级为更高品质大汉堡！';
+        reason = '仅需多加 ¥' + best.diffYuan + ' 零钱，四舍五入等于麦当劳倒贴我钱升级大汉堡！';
       } else {
         reason = '多花 ¥' + best.diffYuan + '，享受更加丰盛扎实的升级组合。';
       }
@@ -558,12 +596,52 @@ const OPTIONS = {
   taste: [['', '不限'], ['chicken', '鸡肉'], ['beef', '牛肉'], ['non_spicy', '不辣']]
 };
 
+const MEME_QUOTES = [
+  '“520 情侣双堡买一送一？笑死，正好够我一人垫肚子。”',
+  '“情侣双人餐？不，这是单身碳水战神的基础打法！”',
+  '“大胃王打法·三堡寸草不生：今天肚子里开麦当劳分店！”',
+  '“汉堡不配水，打工人最后的体面（水龙头有水，汉堡不行）。”',
+  '“套餐硬塞中可乐？退退退！肚子里寸土寸金，不给汽水留空间！”',
+  '“多加 5 毛钱升级板烧鸡腿，四舍五入等于麦当劳倒贴我钱！”',
+  '“穷鬼恩物极限精算：花最狠的零钱，吃最硬的吉士双堡！”',
+  '“把麦当劳底裤算穿：19块钱拿下俩堡，资本家看了都落泪。”',
+  '“生活索然无味，吉士汉堡抚慰；周一到周日我都是麦门狂徒！”',
+  '“第二份半价不是为了找人分享，是为了给大胃王留点尊严。”',
+  '“在工位上像个打工人，在麦当劳点餐柜台前我是选妃的皇帝！”',
+  '“两个汉堡下肚直接给肠胃上对抗，今天谁也别劝我吃草！”',
+  '“麦门永存！若有不服，请我吃俩麦辣鸡腿堡我们当面辩论！”'
+];
+let currentQuoteIdx = 0;
+function nextMemeQuote() {
+  currentQuoteIdx = (currentQuoteIdx + 1) % MEME_QUOTES.length;
+  const el = document.getElementById('memeQuoteText');
+  if (el) el.textContent = MEME_QUOTES[currentQuoteIdx];
+}
+
 function applyPreset(name) {
-  if (name === 'double_no_drink') {
+  if (name === 'couple_solo' || name === 'double_no_drink') {
     state.burger = 2;
     state.drink = 0;
     state.side = 0;
     state.budget = 28;
+    state.taste = '';
+  } else if (name === 'glutton_king') {
+    state.burger = 3;
+    state.drink = 0;
+    state.side = 1;
+    state.budget = 45;
+    state.taste = '';
+  } else if (name === 'no_drink_dignity') {
+    state.burger = 2;
+    state.drink = 0;
+    state.side = 0;
+    state.budget = 25;
+    state.taste = '';
+  } else if (name === 'poor_god_solo' || name === 'budget_20') {
+    state.burger = 2;
+    state.drink = 0;
+    state.side = 0;
+    state.budget = 19;
     state.taste = '';
   } else if (name === 'burger_with_fries') {
     state.burger = 1;
@@ -577,12 +655,6 @@ function applyPreset(name) {
     state.side = 0;
     state.budget = 30;
     state.taste = 'chicken';
-  } else if (name === 'budget_20') {
-    state.burger = 1;
-    state.drink = 0;
-    state.side = 0;
-    state.budget = 20;
-    state.taste = '';
   } else if (name === 'spicy') {
     state.burger = 1;
     state.drink = 1;
@@ -680,7 +752,7 @@ function render() {
           </span>
         </div>
         <div style="font-size:13px; color:#92400E; margin-bottom:10px;">
-          💡 仅需<strong>再加 ¥${up.diffYuan}</strong> 即可吃饱这一餐！
+          💡 仅需<strong>再加 ¥${up.diffYuan}</strong> 即可吃饱！大胃王绝不挨饿！
         </div>
         <button type="button" class="upgrade-btn" style="padding:6px 14px; font-size:12.5px;" onclick="state.budget=${up.targetBudget}; syncSliderUI(); render();">
           ⚡ 一键提升预算至 ¥${up.targetBudget} 查看明细
@@ -699,6 +771,13 @@ function render() {
       }
       why.push(`<span>预算余量 ${yuan(pick.remaining)}</span>`);
       if (pick.items.length < 2) why.push('<span>仅含单款餐品（两份相同）</span>');
+      if (state.burger === 3) {
+        why.push('<span class="hit meme-tag">🦖 大胃王认证：单人狂炫三堡，寸草不生</span>');
+      } else if (state.burger === 2 && state.drink === 0) {
+        why.push('<span class="hit meme-tag">🍔 520一人食打法：实心碳水顶饱，不给汽水留空间</span>');
+      } else if (state.side >= 1) {
+        why.push('<span class="hit meme-tag">🍟 薯条是蔬菜：营养均衡，麦门养生流</span>');
+      }
 
       el.innerHTML = `
         <div class="pick-top">

@@ -206,7 +206,7 @@ def rank(profile, catalog, meal, budget_cents, now=None):
             'total_yuan': best['total_yuan'],
             'target_budget': best['target_budget'],
             'matched_tags': best['matched_tags'],
-            'reason': f"当前预算偏紧，再加 ¥{best['diff_yuan']} 即可满足习惯组合",
+            'reason': f"当前预算偏紧，再加 ¥{best['diff_yuan']} 即可解锁麦门信徒的进食尊严！",
         }
     elif accepted and over_budget_candidates:
         max_accepted_match = max((len(c['matched_tags']) for c in accepted), default=0)
@@ -222,9 +222,9 @@ def rank(profile, catalog, meal, budget_cents, now=None):
             if len(best['matched_tags']) > max_accepted_match:
                 reason = f"仅需多加 ¥{best['diff_yuan']}，即可升级为纯 {'、'.join(best['matched_tags'])} 顶饱大满贯！"
             elif best['over_cents'] <= 300:
-                reason = f"仅需多加 ¥{best['diff_yuan']}（零钱），就能从吉士堡升级为更高品质大汉堡！"
+                reason = f"仅需多加 ¥{best['diff_yuan']} 零钱，四舍五入等于麦当劳倒贴我钱升级大汉堡！"
             else:
-                reason = f"多花 ¥{best['diff_yuan']}，享受更加丰盛扎实的升级组合。"
+                reason = f"多花 ¥{best['diff_yuan']}，直接享受大胃王豪华升级配置。"
             upsell = {
                 'type': 'upgrade',
                 'badge': f"💡 麦门进阶 · 加 ¥{best['diff_yuan']} 可升级",
