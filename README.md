@@ -50,6 +50,10 @@
 👉 **[点击打开在线试玩：https://pha1aris.github.io/mai-habit/](https://pha1aris.github.io/mai-habit/)**  
 （GitHub Pages 部署；亦可直接在本地浏览器中打开 [`docs/index.html`](docs/index.html)，完全支持离线运行）。
 
+<div align="center">
+  <img src="docs/demo-ui.png" alt="麦懂你在线试玩界面，支持左侧设定习惯、右侧实时精算" width="920">
+</div>
+
 **关键说明：**
 
 - **前后端算法同构**：演示页基于纯原生 JavaScript 实现，其组合枚举规则与打分模型严格对照 Python 核心实现（`planner.py` 与 `recommender.py`）。CI 流水线中的 `demo-parity` 任务会全量交叉比对两端输出，确保逻辑零漂移。
