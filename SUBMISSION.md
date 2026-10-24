@@ -24,8 +24,9 @@ Issue 正文（把项目地址替换为真实公开地址）：
 - [ ] 仓库为 public，且创建时间在 2026-01-01 之后
 - [ ] 根目录含 `README.md`、`CONTEST_DECLARATION.md`、`MCP_INTEGRATION.md`、`mcp-config.example.json`
 - [ ] 参与 WorkBuddy 专项：根目录含 `workbuddy.md`
-- [ ] 全仓库搜索无 Token、手机号、地址、账号；`private/` 未提交
-- [ ] `python -m unittest discover -s tests` 全部通过
+- [ ] 全仓库搜索无 Token、手机号、地址、账号；`private/`、`.workbuddy/` 未提交
+- [ ] `python -m unittest discover -s tests` 全部通过（62 项）
+- [ ] 推上 GitHub 后 `.github/workflows/ci.yml` 全绿（3.10–3.13 + 两条冒烟命令 + 截图复现）
 - [ ] README 首屏截图 `docs/terminal.svg` 可正常渲染
 - [ ] 仓库 Topics 建议：`mcp` `mcdonalds` `ai-agent` `skill` `python` `recommendation`
 
