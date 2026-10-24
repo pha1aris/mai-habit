@@ -8,7 +8,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](#)
 [![Dependencies](https://img.shields.io/badge/dependencies-none-2ea44f)](#)
-[![Tests](https://img.shields.io/badge/tests-62%20passing-2ea44f)](#验证)
+[![Tests](https://img.shields.io/badge/tests-74%20passing-2ea44f)](#验证)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 <!-- 仓库推上 GitHub 后，把上面 Tests 徽章换成实时 CI 徽章，并删除这一行注释：
@@ -44,19 +44,28 @@
 ```bash
 git clone https://github.com/<your-account>/mai-habit.git && cd mai-habit
 
-# 1. 看推荐长什么样（内置虚构菜单）
+# 1. 先看推荐长什么样（内置虚构菜单，不改你的任何东西）
 python habit.py demo
 
-# 2. 走完整链路：门店菜单 → 枚举组合 → 逐个计价 → 排序
+# 2. 记录你自己的习惯，之后每次点餐都按它算
+python habit.py init
+#    一餐要几份主食？[2]
+#    要不要搭配饮料？[y/N]
+#    这一餐预算多少元？[30]
+#    固定的口味偏好（可留空）：
+
+# 3. 走完整链路：门店菜单 → 枚举组合 → 逐个计价 → 排序
 python habit.py plan \
-  --profile examples/profile.demo.json \
+  --profile private/profile.json \
   --menu    examples/replay/menu.json \
   --prices  examples/replay/prices.json \
   --mapping examples/replay/mapping.json \
-  --meal lunch --budget 28 --store MCD-DEMO-001
+  --meal lunch --store MCD-DEMO-001
 ```
 
-第二条命令和接入真实服务走的是**同一套代码路径**，只是把网络响应换成了仓库里的脱敏样本。所以没有 Token 也能验证每一环。
+第 3 步和接入真实服务走的是**同一套代码路径**，只是把网络响应换成了仓库里的脱敏样本。第 2 步记下的预算会成为默认值，`--budget` 可以省略。
+
+**为什么第 2 步不能省：** 仓库里自带的 `examples/profile.json` 是「两个汉堡、不含饮料」的示例，不是你的习惯。如果直接拿它跑，得到的是一份按别人条件算出来的推荐——那正是这个项目想避免的事。所以示例档案带 `"source": "example"` 标记，用到它时会明确提醒你一次。
 
 两个容易被忽略的兼容性细节：
 
@@ -142,31 +151,42 @@ flowchart LR
 
 ## 它是怎么记住习惯的
 
-档案默认放私有目录，只在用户**明确表达**时记录：
+第一件事是问你，而不是猜你。`init` 逐项问清组成、预算、口味和忌口，写进私有档案；留空就采用括号里的默认值，但那也是你点了头的结果。
 
 ```bash
-mkdir -p private
-cp examples/profile.json private/profile.json
+# 交互式：一项一项问，留空用默认值
+python habit.py init
 
-# 用户明确说"今天这个板烧不错"之后，才记录
-python habit.py feedback --profile private/profile.json --meal lunch --tags chicken,non_spicy --rating like
-
-python habit.py demo --profile private/profile.json
+# 非交互式：给智能体或脚本用，等价于同样的档案
+python habit.py init --burger 2 --drink none --budget 25 --tags chicken,non_spicy
 ```
 
 ```json
 {
-  "preferred_tags": [],
+  "source": "user",
+  "created_at": "2026-10-24T10:55:17+08:00",
   "category_limits": {
     "burger": {"min": 2, "max": 2},
     "drink":  {"max": 0}
   },
-  "feedback": {}
+  "preferred_tags": ["chicken"],
+  "avoid_tags": [],
+  "feedback": {},
+  "default_budget_cents": 2500
 }
+```
+
+之后只在你**明确表达**时才追加记录：
+
+```bash
+# 用户明说"今天这个板烧不错"之后，才记录
+python habit.py feedback --profile private/profile.json --meal lunch --tags chicken,non_spicy --rating like
 ```
 
 要点：
 
+- **`source` 区分「你说的」和「示例里的」。** `example` 会在运行时被提醒，`user` 才是你自己的习惯；没有这个字段的档案一律按示例对待。
+- **`init` 不会覆盖已有档案**，除非显式 `--force`。档案写在 `private/` 下，权限 600。
 - 反馈按 `breakfast / lunch / dinner` 分开统计，早餐的偏好不会污染晚餐。
 - **"推荐过"不等于"吃过"。** 只有用户明确点赞/不喜欢才进历史。
 - 档案是一个可读可改可删的 JSON，不藏数据库。
@@ -243,7 +263,7 @@ python habit.py plan \
 habit.py                         命令行入口
 skills/mai-habit/
   SKILL.md                       智能体可直接加载的 Skill 说明
-  scripts/main.py                demo / plan / recommend / feedback / mcp-*
+  scripts/main.py                init / demo / plan / recommend / feedback / mcp-*
   scripts/planner.py             按习惯枚举组合（同款多份、类别上下限）
   scripts/adapter.py             MCP 响应 → 内部契约（显式映射，不猜字段）
   scripts/recommender.py         过滤、归一化权重打分、可解释输出
@@ -254,7 +274,7 @@ examples/
   profile.demo.json              带口味与反馈的演示档案
   catalog.demo.json              内置演示候选
   replay/                        脱敏回放样本，用于无 Token 跑通全链路
-tests/                           62 项测试
+tests/                           74 项测试
 tools/render_screenshot.py       把真实输出渲染成 README 用的 SVG（CI 校验）
 .github/workflows/ci.yml         4 个 Python 版本 + 两条冒烟命令 + 截图复现
 ```
@@ -265,7 +285,7 @@ tools/render_screenshot.py       把真实输出渲染成 README 用的 SVG（CI
 python -m unittest discover -s tests -v
 ```
 
-覆盖：组成约束枚举、类别上下限、预算边界与优惠余量、报价过期、门店与餐段错配、忌口未核实、反馈学习只作用于对应餐段、权重归一化、MCP JSON/SSE 握手、分页游标、只读白名单、工具目录缓存、429/5xx 重试与 `Retry-After`、回放链路端到端、映射失败的原因聚合、cp936 控制台编码。
+覆盖：习惯建档（交互/非交互、默认值、拒绝覆盖、示例档案提醒）、组成约束枚举、类别上下限、预算边界与优惠余量、报价过期、门店与餐段错配、忌口未核实、反馈学习只作用于对应餐段、权重归一化、MCP JSON/SSE 握手、分页游标、只读白名单、工具目录缓存、429/5xx 重试与 `Retry-After`、回放链路端到端、映射失败的原因聚合、cp936 控制台编码。
 
 ## 关于本仓库
 

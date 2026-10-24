@@ -80,7 +80,7 @@
 
 ### 新增回放样本与端到端测试
 
-`examples/replay/` 提供虚构的门店菜单、映射、计价响应；`tests/test_pipeline.py` 覆盖映射、枚举、模板渲染、金额单位、CLI 端到端与忌口拒绝路径。测试从 18 项增至 62 项。
+`examples/replay/` 提供虚构的门店菜单、映射、计价响应；`tests/test_pipeline.py` 覆盖映射、枚举、模板渲染、金额单位、CLI 端到端与忌口拒绝路径。测试从 18 项增至 74 项，新增习惯建档与示例档案提醒的用例。
 
 ### 重写 `README.md`
 
@@ -113,7 +113,7 @@
 ## 可复现验证
 
 ```bash
-python -m unittest discover -s tests -v      # 62 项通过
+python -m unittest discover -s tests -v      # 74 项通过
 python habit.py demo                          # 内置演示
 python habit.py plan \
   --profile examples/profile.demo.json \

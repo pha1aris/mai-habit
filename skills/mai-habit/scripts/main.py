@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 import sys
 
-from recommender import TZ, learn, markdown, rank, set_currency
+from recommender import TZ, learn, markdown, money, rank, set_currency
 from mcp_client import Client, MCPError
 import adapter
 import console
@@ -50,6 +50,104 @@ def cents(value):
         raise ValueError('预算需为有效金额') from None
 
 
+def ask(prompt, default=''):
+    """Read one answer; a blank answer keeps the default shown in the prompt."""
+    try:
+        answer = input(prompt).strip()
+    except EOFError:
+        raise ValueError('输入已中断，未写入档案') from None
+    return answer or default
+
+
+def ask_count(prompt, default):
+    raw = ask(prompt, str(default))
+    try:
+        return positive(raw)
+    except argparse.ArgumentTypeError as exc:
+        raise ValueError(f'{exc}（收到：{raw}）') from None
+
+
+SECTION_LABELS = {'burger': '主食（汉堡/卷）', 'side': '小食', 'combo': '套餐'}
+
+
+def init_run(args):
+    """Collect the user's own habits before anything else runs.
+
+    Nothing is inferred here: every value comes from a flag or from an explicit
+    answer, and the answers are written to the profile so later runs never have
+    to guess. A blank answer accepts the printed default -- but it is still the
+    user who accepted it, which is the difference from silently assuming one.
+    """
+    target = Path(args.out)
+    if target.exists() and not args.force:
+        raise ValueError(f'{target} 已存在；覆盖请加 --force，或换一个 --out 路径')
+    interactive = sys.stdin.isatty()
+    label = SECTION_LABELS.get(args.category, args.category)
+    if args.burger is None:
+        if not interactive:
+            raise ValueError('非交互环境请用 --burger N --drink none|one 指定习惯')
+        args.burger = ask_count(f'一餐要几份{label}？[2] ', 2)
+    if args.drink is None:
+        if not interactive:
+            raise ValueError('非交互环境请用 --drink none|one 说明是否要饮料')
+        pick = ask('要不要搭配饮料？[y/N] ', 'n').lower()
+        args.drink = 'one' if pick in {'y', 'yes', '是', '要'} else 'none'
+    if args.budget is None:
+        if not interactive:
+            raise ValueError('非交互环境请用 --budget 说明预算')
+        args.budget = ask('这一餐预算多少元？[30] ', '30')
+    budget_cents = cents(args.budget)
+    if args.tags is None and interactive:
+        args.tags = ask('固定的口味偏好，留空表示没有（例如 chicken,non_spicy）：')
+    if args.avoid is None and interactive:
+        args.avoid = ask('明确忌口，留空表示没有（例如 peanut）：')
+    tags = [t.strip() for t in (args.tags or '').split(',') if t.strip()]
+    avoid = [t.strip() for t in (args.avoid or '').split(',') if t.strip()]
+    profile = {
+        'source': 'user',
+        'created_at': datetime.now(TZ).isoformat(timespec='seconds'),
+        'category_limits': {args.category: {'min': args.burger, 'max': args.burger},
+                            'drink': {'min': 1, 'max': 1} if args.drink == 'one' else {'max': 0}},
+        'preferred_tags': tags,
+        'avoid_tags': avoid,
+        'feedback': {},
+        'default_budget_cents': budget_cents,
+    }
+    write(target, profile)
+    lines = [f'已写入 {target}（仅本机，文件权限 600，可直接编辑或删除）', '',
+             f'· 每餐 {label} × {args.burger}',
+             f'· {"搭配 1 份饮料" if args.drink == "one" else "不含饮料"}',
+             f'· 默认预算 {money(budget_cents)}',
+             f'· 口味偏好 {len(tags)} 项，忌口 {len(avoid)} 项']
+    if avoid:
+        lines.append(f'· 推荐时需要 --checked-avoid {",".join(avoid)} 声明已核实范围')
+    lines += ['', '下一餐直接运行（预算与习惯都从档案读取）：',
+              f'  python habit.py plan --profile {target} \\',
+              '    --menu private/menu-response.json --mapping private/mapping.json \\',
+              '    --meal lunch --store <门店编号>']
+    print('\n'.join(lines))
+    return 0
+
+
+def warn_if_example(profile, path):
+    """Say out loud when the habits being ranked are not the user's own."""
+    if profile.get('source') == 'user':
+        return
+    print(f'注意：{path} 是示例档案（主食两份、不含饮料），不是你的习惯。'
+          '先运行 python habit.py init 建档，否则这份推荐是按别人的条件算的。',
+          file=sys.stderr)
+
+
+def budget_of(args, profile):
+    """Explicit flag wins; otherwise use the budget the user recorded at init."""
+    if getattr(args, 'budget', None) is not None:
+        return cents(args.budget)
+    stored = profile.get('default_budget_cents')
+    if isinstance(stored, int) and not isinstance(stored, bool) and stored > 0:
+        return stored
+    raise ValueError('请用 --budget 指定本餐预算，或先运行 habit.py init 记录默认预算')
+
+
 def plan_run(args):
     """Enumerate habit-valid combinations, price them, then rank.
 
@@ -57,8 +155,9 @@ def plan_run(args):
     replays recorded responses so the whole chain is testable without a token.
     """
     profile = read(args.profile)
+    warn_if_example(profile, args.profile)
     mapping = read(args.mapping)
-    budget_cents = cents(args.budget)
+    budget_cents = budget_of(args, profile)
     checked = [t.strip() for t in (args.checked_avoid or '').split(',') if t.strip()]
     if profile.get('avoid_tags') and not set(profile['avoid_tags']) <= set(checked):
         raise ValueError('档案含忌口但未声明核实范围，请用 --checked-avoid 指明已核实的忌口')
@@ -163,7 +262,7 @@ def positive(value):
 
 def main():
     set_currency(console.prepare())
-    parser = argparse.ArgumentParser(description='麦懂你：用餐习惯套餐推荐')
+    parser = argparse.ArgumentParser(prog='habit.py', description='麦懂你：用餐习惯套餐推荐')
     commands = parser.add_subparsers(dest='command', required=True)
     demo = commands.add_parser('demo', help='无 Token 的虚构数据演示')
     demo.add_argument('--budget', default='30')
@@ -173,7 +272,7 @@ def main():
     recommend = commands.add_parser('recommend', help='对已规范化候选进行排序')
     recommend.add_argument('--profile', required=True)
     recommend.add_argument('--catalog', required=True)
-    recommend.add_argument('--budget', required=True)
+    recommend.add_argument('--budget', help='本餐预算；省略则用档案里记录的默认预算')
     recommend.add_argument('--meal', choices=['breakfast', 'lunch', 'dinner'], required=True)
     recommend.add_argument('--json', action='store_true')
     feedback = commands.add_parser('feedback', help='将用户明确反馈写入本地档案')
@@ -181,12 +280,21 @@ def main():
     feedback.add_argument('--meal', choices=['breakfast', 'lunch', 'dinner'], required=True)
     feedback.add_argument('--tags', required=True, help='逗号分隔的餐品口味标签')
     feedback.add_argument('--rating', choices=['like', 'dislike'], required=True)
+    init = commands.add_parser('init', help='先记录你自己的用餐习惯，再开始推荐')
+    init.add_argument('--out', default='private/profile.json', help='档案路径（默认 private/profile.json）')
+    init.add_argument('--category', default='burger', help='主食类别键，默认 burger')
+    init.add_argument('--burger', type=positive, help='一餐要几份主食')
+    init.add_argument('--drink', choices=['none', 'one'], help='是否搭配一份饮料')
+    init.add_argument('--budget', help='默认每餐预算（元）')
+    init.add_argument('--tags', help='固定口味偏好，逗号分隔')
+    init.add_argument('--avoid', help='明确忌口，逗号分隔')
+    init.add_argument('--force', action='store_true', help='覆盖已有档案')
     plan = commands.add_parser('plan', help='从查询响应枚举候选、计价并排序')
     plan.add_argument('--profile', required=True)
     plan.add_argument('--mapping', required=True, help='字段映射文件，非官方接口定义')
     plan.add_argument('--menu', required=True, help='query-meals 的原始响应 JSON')
     plan.add_argument('--meal', choices=['breakfast', 'lunch', 'dinner'], required=True)
-    plan.add_argument('--budget', required=True)
+    plan.add_argument('--budget', help='本餐预算；省略则用档案里记录的默认预算')
     plan.add_argument('--store', required=True)
     plan.add_argument('--prices', help='calculate-price 回放样本；省略则实时调用 MCP')
     plan.add_argument('--checked-avoid', help='已核实不含的忌口，逗号分隔')
@@ -211,8 +319,11 @@ def main():
                     candidate['quote']['meal_time'] = args.meal
             else:
                 profile, catalog = read(args.profile), read(args.catalog)
-            result = rank(profile, catalog, args.meal, cents(args.budget), now)
+                warn_if_example(profile, args.profile)
+            result = rank(profile, catalog, args.meal, budget_of(args, profile), now)
             print(json.dumps(result, ensure_ascii=False, indent=2) if args.json else markdown(result))
+        elif args.command == 'init':
+            return init_run(args)
         elif args.command == 'plan':
             result, catalog = plan_run(args)
             if args.out:

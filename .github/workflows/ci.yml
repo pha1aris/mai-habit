@@ -44,6 +44,17 @@ jobs:
           grep -q '最合口味' plan.txt
           grep -q '试算其中' plan.txt
           grep -q '非真实菜单或报价' plan.txt
+      - name: Habits are recorded before any recommendation
+        run: |
+          python habit.py init --out private/profile.json --burger 2 --drink none \
+            --budget 25 --tags chicken
+          grep -q '"source": "user"' private/profile.json
+          python habit.py plan --profile private/profile.json \
+            --mapping examples/replay/mapping.json \
+            --menu examples/replay/menu.json \
+            --prices examples/replay/prices.json \
+            --meal lunch --store MCD-DEMO-001 > own.txt
+          grep -q '25.00' own.txt
       - name: A broken mapping fails loudly instead of guessing
         run: |
           python -c "import json,pathlib; m=json.loads(pathlib.Path('examples/replay/mapping.json').read_text(encoding='utf-8')); m['quote']={'total_cents':'notThere'}; pathlib.Path('bad.json').write_text(json.dumps(m), encoding='utf-8')"
