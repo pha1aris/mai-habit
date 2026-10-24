@@ -13,9 +13,7 @@
 
 **[▶ 在线试玩](#在线试玩)** ｜ **[30 秒上手](#三十秒跑起来)** ｜ **[它怎么排的](#打分怎么来的)** ｜ **[只读边界](#边界)**
 
-<!-- 仓库推上 GitHub 后，把上面 Tests 徽章换成实时 CI 徽章，并删除这一行注释：
-[![ci](https://github.com/<your-account>/mai-habit/actions/workflows/ci.yml/badge.svg)](https://github.com/<your-account>/mai-habit/actions/workflows/ci.yml)
--->
+<!-- 推上 GitHub 后，可把上面的 Tests 徽章换成 Actions 页面给你的实时 CI 徽章地址。 -->
 
 <img src="docs/terminal.svg" alt="麦懂你推荐输出，含三档推荐与逐条排除原因" width="920">
 
@@ -53,10 +51,10 @@
 
 ## 三十秒跑起来
 
-无需 Token、无需第三方依赖、Python 3.10+：
+无需 Token、无需第三方依赖、Python 3.10+。clone 或下载本仓库后，进入目录：
 
 ```bash
-git clone https://github.com/<your-account>/mai-habit.git && cd mai-habit
+cd mai-habit
 
 # 1. 先看推荐长什么样（内置虚构菜单，不改你的任何东西）
 python habit.py demo
